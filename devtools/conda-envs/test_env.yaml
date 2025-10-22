@@ -9,7 +9,10 @@ dependencies:
   - pip
 
   # SEAMM
+  - h5py
+  - py-cpuinfo
   - seamm
+  - tabulate
 
   # Testing
   - black
