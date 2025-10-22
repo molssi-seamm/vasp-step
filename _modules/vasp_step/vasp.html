@@ -513,7 +513,7 @@
 
 
 <div class="viewcode-block" id="VASP">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">VASP</span><span class="p">(</span><span class="n">seamm</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The non-graphical part of a VASP step in a flowchart.</span>
@@ -619,7 +619,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_potential_metadata</span>
 
 <div class="viewcode-block" id="VASP.set_id">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP.set_id">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP.set_id">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the id for node to a given tuple&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">node_id</span>
@@ -631,7 +631,7 @@
 
 
 <div class="viewcode-block" id="VASP.create_parser">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP.create_parser">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP.create_parser">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the command-line / config file parser&quot;&quot;&quot;</span>
         <span class="n">parser_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_type</span>
@@ -688,7 +688,7 @@
 
 
 <div class="viewcode-block" id="VASP.description_text">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP.description_text">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP.description_text">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">description_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the text description of what this step will do.</span>
 <span class="sd">        The dictionary of control values is passed in as P so that</span>
@@ -736,7 +736,7 @@
 
 
 <div class="viewcode-block" id="VASP.run">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP.run">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a VASP step.</span>
 
@@ -767,7 +767,7 @@
 
 
 <div class="viewcode-block" id="VASP.analyze">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP.analyze">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP.analyze">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Do any analysis of the output from this step.</span>
 
@@ -794,7 +794,7 @@
 
 
 <div class="viewcode-block" id="VASP.catalog_potentials">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP.catalog_potentials">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP.catalog_potentials">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">catalog_potentials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a catalog of the PAW potentials.&quot;&quot;&quot;</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time_ns</span><span class="p">()</span>
@@ -821,7 +821,7 @@
 
 
 <div class="viewcode-block" id="VASP.parse_potcar">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.vasp.VASP.parse_potcar">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.vasp.VASP.parse_potcar">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_potcar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read a POTCAR file and extract pertinent information.</span>
 
