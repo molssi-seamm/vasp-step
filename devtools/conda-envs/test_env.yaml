@@ -10,6 +10,7 @@ dependencies:
 
   # SEAMM
   - h5py
+  - pubchempy
   - py-cpuinfo
   - seamm
   - tabulate
