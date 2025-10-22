@@ -28,6 +28,7 @@ dependencies:
 
   # Pip-only installs
   - pip:
+    - seamm-exec
     # Documentation
     - sphinx-copybutton
     - sphinxnotes-strike
