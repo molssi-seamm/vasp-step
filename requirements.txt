@@ -1,3 +1,6 @@
+h5py
+py-cpuinfo
 seamm
 seamm-util
 seamm-widgets
+tabulate
