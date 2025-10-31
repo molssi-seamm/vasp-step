@@ -384,7 +384,7 @@ class Optimization(vasp_step.Energy):
         configuration.cell.from_vectors(latit[-1])
         # Reorder the atoms back to SEAMM order
         tmp = fractionals[-1].tolist()
-        configuration.atoms.coordinates = [tmp[i] for i in self.to_VASP_order]
+        configuration.atoms.coordinates = [tmp[i] for i in self.to_SEAMM_order]
 
         super().analyze(
             P=P,
