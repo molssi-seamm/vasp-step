@@ -234,7 +234,7 @@ class Optimization(vasp_step.Energy):
                 context=seamm.flowchart_variables._data
             )
 
-        # Get tke keywords from the energy class
+        # Get the keywords from the energy class
         keywords, descriptions = super().get_keywords(P=P)
 
         # The definition of the type of calculation: optimization
