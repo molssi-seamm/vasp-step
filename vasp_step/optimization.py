@@ -5,7 +5,6 @@
 import logging
 from pathlib import Path
 import pkg_resources
-import pprint  # noqa: F401
 import textwrap
 
 import h5py
@@ -14,7 +13,6 @@ from tabulate import tabulate
 import vasp_step
 import molsystem
 import seamm
-from seamm_util import ureg, Q_  # noqa: F401
 import seamm_util.printing as printing
 from seamm_util.printing import FormattedText as __
 

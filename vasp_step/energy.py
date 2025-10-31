@@ -257,7 +257,7 @@ class Energy(seamm.Node):
         atnos = configuration.atoms.atomic_numbers
         unique_atnos = sorted(list(set(atnos)), reverse=True)
 
-        # The dictionarie to translate to/from the VASP order
+        # The dictionary to translate to/from the VASP order
         self._to_VASP_order = []
         self._to_SEAMM_order = []
         self._element_count = {atno: 0 for atno in atnos}
