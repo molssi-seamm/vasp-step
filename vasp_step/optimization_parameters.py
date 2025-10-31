@@ -4,7 +4,6 @@ Control parameters for the Optimization step in a SEAMM flowchart
 """
 
 import logging
-import pprint  # noqa: F401
 
 from .energy_parameters import EnergyParameters
 

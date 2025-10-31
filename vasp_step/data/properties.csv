@@ -11,5 +11,5 @@ cell_c#VASP#{model},float,Å,"The cell length c.",https://en.wikipedia.org/wiki/
 cell_alpha#VASP#{model},float,degree,"The cell angle alpha.",https://en.wikipedia.org/wiki/Unit_cell
 cell_beta#VASP#{model},float,degree,"The cell angle beta.",https://en.wikipedia.org/wiki/Unit_cell
 cell_gamma#VASP#{model},float,degree,"The cell angle gamma.",https://en.wikipedia.org/wiki/Unit_cell
-"RMS atom force#VASP#{model}#VASP#{model},float,atm,"The RMS force on the atoms.",
-"maximum atom force#VASP#{model}#VASP#{model},float,atm,"The maximum force on an atom.",
+RMS atom force#VASP#{model},float,eV/Å,"The RMS force on the atoms.",
+maximum atom force#VASP#{model},float,eV/Å,"The maximum force on an atom.",

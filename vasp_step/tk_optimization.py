@@ -2,11 +2,9 @@
 
 """The graphical part of a Optimization step"""
 
-import pprint  # noqa: F401
 import tkinter as tk
 
 from .tk_energy import TkEnergy
-from seamm_util import ureg, Q_, units_class  # noqa: F401, E999
 import seamm_widgets as sw
 
 

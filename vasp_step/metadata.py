@@ -491,7 +491,7 @@ metadata["keywords"] = {
     },
     "ISIF": {
         "description": (
-            "Determines whether the stress is calculation, and degrees of freedom."
+            "Determines whether the stress is calculated, and degrees of freedom."
         ),
         "default": 3,
     },
