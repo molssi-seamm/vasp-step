@@ -400,7 +400,7 @@ class Optimization(vasp_step.Energy):
         tmpcell.from_vectors(latit[0])
         a0, b0, c0, alpha0, beta0, gamma0 = tmpcell.parameters
         V0 = tmpcell.volume
-        tmpcell.from_vectors(latit[1])
+        tmpcell.from_vectors(latit[-1])
         a, b, c, alpha, beta, gamma = tmpcell.parameters
         V = tmpcell.volume
         ctable = {
