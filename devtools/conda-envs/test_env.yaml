@@ -10,6 +10,7 @@ dependencies:
 
   # SEAMM
   - h5py
+  - numpy
   - pubchempy
   - py-cpuinfo
   - seamm

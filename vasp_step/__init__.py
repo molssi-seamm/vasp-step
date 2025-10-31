@@ -19,6 +19,11 @@ from .energy import Energy  # noqa: F401
 from .energy_parameters import EnergyParameters  # noqa: F401
 from .tk_energy import TkEnergy  # noqa: F401
 
+from .optimization_step import OptimizationStep  # noqa: F401
+from .optimization import Optimization  # noqa: F401
+from .optimization_parameters import OptimizationParameters  # noqa: F401
+from .tk_optimization import TkOptimization  # noqa: F401
+
 # Handle versioneer
 from ._version import get_versions
 
