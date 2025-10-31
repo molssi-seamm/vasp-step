@@ -476,7 +476,7 @@ metadata["keywords"] = {
     },
     "NSIM": {
         "description": (
-            "Number of bands to optimize simulataneously when using RMM-DIIS or"
+            "Number of bands to optimize simultaneously when using RMM-DIIS or"
             "the blocked Davidson algorithm (NSIM)"
         ),
         "default": 4,
