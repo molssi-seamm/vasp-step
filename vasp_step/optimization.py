@@ -251,7 +251,7 @@ class Optimization(vasp_step.Energy):
                 keywords["NFREE"] = P["iteration history length"]
         elif "MD" in method:
             keywords["IBRION"] = 3
-            if P["damped ND approach"] == "damping":
+            if P["damped MD approach"] == "damping":
                 keywords["SMASS"] = P["force scale factor"]
                 keywords["POTIM"] = 2 * (1 - float(P["velocity scale factor"]))
             else:
