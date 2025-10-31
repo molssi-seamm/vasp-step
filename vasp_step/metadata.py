@@ -400,7 +400,7 @@ metadata["keywords"] = {
     },
     "EDIFFG": {
         "description": (
-            "Convergence criterion for optimizations +'tive for energy (eV) or -'tive"
+            "Convergence criterion for optimizations: positive for energy (eV) or negative "
             "for forces [(eV/Å)^2]"
         ),
         "default": "-1.0E-06",
