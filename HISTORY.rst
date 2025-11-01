@@ -2,6 +2,8 @@
 History
 =======
 
+2025.10.31: Added optimization and improved the output.
+
 2025.10.22: First working version
     * Handles single point energies reasonably well.
 

@@ -1025,6 +1025,25 @@ class TkEnergy(seamm.TkNode):
         for key in ("input only", "calculate stress"):
             self[key] = P[key].widget(main_frame)
 
+        # Frame to isolate widgets for the calculation definition
+        calculation_frame = self["calculation frame"] = ttk.LabelFrame(
+            main_frame,
+            borderwidth=4,
+            relief="sunken",
+            text="Single-Point Energy Control",
+            labelanchor="n",
+            padding=10,
+        )
+        # Then create the widgets and place them
+        row = 0
+        widgets = []
+        for key in ("calculate stress",):
+            w = self[key] = P[key].widget(calculation_frame)
+            w.grid(row=row, column=0, sticky="ew")
+            row += 1
+            widgets.append(w)
+        sw.align_labels(widgets, sticky="e")
+
         # Frame to isolate widgets
         e_frame = self["model frame"] = ttk.LabelFrame(
             main_frame,
@@ -1061,19 +1080,24 @@ class TkEnergy(seamm.TkNode):
         # Then create the widgets and place them
         row = 0
         widgets = []
-        for key in ("electronic method", "nelm", "ediff"):
+        for key in ("electronic method", "nelm", "nelmin", "ediff"):
             w = self[key] = P[key].widget(scf_frame)
             w.grid(row=row, column=0, sticky="ew")
             row += 1
             widgets.append(w)
         sw.align_labels(widgets, sticky="e")
 
+        for key in ("electronic method",):
+            self[key].bind("<<ComboboxSelected>>", self.reset_performance_frame)
+            self[key].bind("<Return>", self.reset_performance_frame)
+            self[key].bind("<FocusOut>", self.reset_performance_frame)
+
         # The k-space integration
         k_frame = self["k-space frame"] = ttk.LabelFrame(
             main_frame,
             borderwidth=4,
             relief="sunken",
-            text="k-space integration (for periodic systems)",
+            text="K-space Integration",
             labelanchor="n",
             padding=10,
         )
@@ -1098,18 +1122,22 @@ class TkEnergy(seamm.TkNode):
             padding=10,
         )
 
-        # Then create the widgets and place them
-        row = 0
-        widgets = []
-        for key in ("ncore", "kpar", "lplane", "lreal"):
-            w = self[key] = P[key].widget(performance_frame)
-            w.grid(row=row, column=0, sticky="ew")
-            row += 1
-            widgets.append(w)
-        sw.align_labels(widgets, sticky="e")
+        # Then create the widgets
+        for key in (
+            "np",
+            "ncore",
+            "kpar",
+            "lplane",
+            "lreal",
+            "lscalapack",
+            "lscalu",
+            "nsim",
+        ):
+            self[key] = P[key].widget(performance_frame)
 
-        # and lay them out
-        self.reset_dialog()
+        # Top level needs to call reset_dialog to layout the dialog
+        if self.node.calculation == "energy":
+            self.reset_dialog()
 
         self.create_potentials_tab()
 
@@ -1365,7 +1393,7 @@ class TkEnergy(seamm.TkNode):
         self["enmax"].set(self.get_Emax(), unit_string="eV")
         self["enmax"].config(state="readonly")
 
-    def reset_dialog(self, widget=None):
+    def reset_dialog(self, widget=None, row=0):
         """Layout the widgets in the dialog.
 
         The widgets are chosen by default from the information in
@@ -1397,36 +1425,31 @@ class TkEnergy(seamm.TkNode):
         # Shortcut for parameters
         P = self.node.parameters
 
-        # keep track of the row in a variable, so that the layout is flexible
-        # if e.g. rows are skipped to control such as "method" here
-        row = 0
-
         # Whether to just write input
         self["input only"].grid(row=row, column=0, sticky=tk.W)
         row += 1
 
+        # The calculation
+        self["calculation frame"].grid(row=row, column=0, columnspan=4, pady=5)
+        row += 1
+
         # The model for the calculation
-        self["model frame"].grid(row=row, column=0, columnspan=2, pady=5, sticky="ew")
+        self["model frame"].grid(row=row, column=0, columnspan=2, pady=5, sticky="new")
+        self["scf frame"].grid(row=row, column=2, columnspan=2, pady=5, sticky="new")
         row += 1
-        self["k-space frame"].grid(row=row, column=0, columnspan=2, pady=5, sticky="ew")
-        row += 1
-        self["scf frame"].grid(row=row, column=0, columnspan=2, pady=5, sticky="ew")
-        row += 1
+        self["k-space frame"].grid(
+            row=row, column=0, columnspan=2, pady=5, sticky="new"
+        )
         self["performance frame"].grid(
-            row=row, column=0, columnspan=2, pady=5, sticky="ew"
+            row=row, column=2, columnspan=2, pady=5, sticky="new"
         )
         row += 1
 
-        # Other parameters for a single-point calculation
-        if type(self) is vasp_step.TkEnergy:
-            keys = ["calculate stress"]
-            for key in keys:
-                self[key].grid(row=row, column=0, columnspan=2, pady=10, sticky="w")
-                row += 1
-
         # Layout the energy widgets
+        self.reset_calculation_frame()
         self.reset_model_frame()
         self.reset_kspace_frame()
+        self.reset_performance_frame()
 
         # Setup the results if there are any
         have_results = (
@@ -1436,6 +1459,15 @@ class TkEnergy(seamm.TkNode):
             self.setup_results()
 
         return row
+
+    def reset_calculation_frame(self, widget=None):
+        """Layout the widgets for the calculation control.
+
+        Note
+        ----
+        The single point energy has nothing that changes, so do nothing.
+        """
+        pass
 
     def reset_model_frame(self, widget=None):
         """Layout the widgets in the dialog.
@@ -1519,6 +1551,7 @@ class TkEnergy(seamm.TkNode):
 
         # Align the labels
         sw.align_labels(widgets, sticky=tk.E)
+        frame.columnconfigure(0, weight=1)
 
         # Setup the results if there are any
         have_results = (
@@ -1559,40 +1592,90 @@ class TkEnergy(seamm.TkNode):
         # keep track of the row in a variable, so that the layout is flexible
         # if e.g. rows are skipped to control such as "method" here
         row = 0
+        widgets = []
+        widgets1 = []
 
         # The model for the calculation
         key = "k-grid method"
         method = self[key].get()
         self[key].grid(row=row, column=0, columnspan=4, sticky=tk.W)
+        widgets.append(self[key])
         row += 1
 
         if "explicit" in method:
             for col, key in enumerate(("na", "nb", "nc"), start=1):
                 self[key].grid(row=row, column=col, sticky=tk.EW)
             row += 1
+        elif "point" in method:
+            pass
         else:
-            widgets = []
             for key in ("k-spacing", "odd grid", "centering"):
                 self[key].grid(row=row, column=1, columnspan=3, sticky=tk.EW)
-                widgets.append(self[key])
+                widgets1.append(self[key])
                 row += 1
-            sw.align_labels(widgets, sticky=tk.E)
-        frame.columnconfigure(0, minsize=30)
 
         key = "occupation type"
         smearing = self[key].get()
         self[key].grid(row=row, column=0, columnspan=4, sticky=tk.W)
+        widgets.append(self[key])
         row += 1
 
         if "Methfessel-Paxton" in smearing:
             key = "Methfessel-Paxton order"
-            self[key].grid(row=row, column=1, columnspan=3, sticky=tk.W)
+            self[key].grid(row=row, column=1, columnspan=3, sticky=tk.EW)
+            widgets1.append(self[key])
             row += 1
 
         if "without smearing" not in smearing:
             key = "smearing width"
-            self[key].grid(row=row, column=1, columnspan=3, sticky=tk.W)
+            self[key].grid(row=row, column=1, columnspan=3, sticky=tk.EW)
+            widgets1.append(self[key])
             row += 1
+
+        w0 = sw.align_labels(widgets, sticky=tk.E)
+        w1 = sw.align_labels(widgets1, sticky=tk.E)
+        minwidth = w0 - w1 + 30
+        frame.columnconfigure(0, minsize=minwidth)
+        frame.columnconfigure(1, weight=1)
+        frame.columnconfigure(2, weight=1)
+        frame.columnconfigure(3, weight=1)
+
+    def reset_performance_frame(self, widget=None):
+        """Layout the widgets in the performance frame.
+
+        Parameters
+        ----------
+        widget : Tk Widget = None
+
+        Returns
+        -------
+        None
+        """
+
+        # Remove any widgets previously packed
+        frame = self["performance frame"]
+        for slave in frame.grid_slaves():
+            slave.grid_forget()
+
+        electronic_method = self["electronic method"].get()
+
+        keys = ["np", "ncore", "kpar", "lplane", "lreal", "lscalapack", "lscalu"]
+        if (
+            self.is_expr(electronic_method)
+            or "fast" in electronic_method
+            or "normal" in electronic_method
+        ):
+            keys.append("nsim")
+
+        row = 0
+        widgets = []
+        for key in keys:
+            self[key].grid(row=row, column=0, sticky=tk.EW)
+            widgets.append(self[key])
+            row += 1
+
+        # Align the labels
+        sw.align_labels(widgets, sticky=tk.E)
 
     def right_click(self, event):
         """

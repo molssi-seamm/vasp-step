@@ -1,6 +1,8 @@
 h5py
+numpy
 py-cpuinfo
 seamm
+seamm-exec
 seamm-util
 seamm-widgets
 tabulate

@@ -84,9 +84,11 @@ setup(
             'VASP = vasp_step:VASPStep',
         ],
         'org.molssi.seamm.vasp': [
+            'Optimization = vasp_step:OptimizationStep',
             'Energy = vasp_step:EnergyStep',
         ],
         'org.molssi.seamm.vasp.tk': [
+            'Optimization = vasp_step:OptimizationStep',
             'Energy = vasp_step:EnergyStep',
         ],
     },

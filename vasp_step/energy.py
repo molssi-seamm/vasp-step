@@ -5,7 +5,6 @@
 import configparser
 import csv
 from datetime import datetime, timezone
-import h5py
 import importlib
 import logging
 from math import ceil as ceiling
@@ -17,6 +16,9 @@ import shutil
 import textwrap
 import time
 
+import h5py
+import numpy as np
+from numpy import linalg as LA
 from cpuinfo import get_cpu_info
 from tabulate import tabulate
 
@@ -163,8 +165,9 @@ class Energy(seamm.Node):
         self._model = None
         self._metadata = vasp_step.metadata
         self.parameters = vasp_step.EnergyParameters()
-        self._to_VASP_order = {}  # translation from SEAMM order to VASP
-        self._to_SEAMM_order = {}  # translation from VASP order to SEAMM
+        self._element_count = {}  # Number of atoms of each element (atomic number)
+        self._to_VASP_order = []  # translation from SEAMM order to VASP
+        self._to_SEAMM_order = []  # translation from VASP order to SEAMM
 
         self._gamma_point_only = False
 
@@ -224,6 +227,53 @@ class Energy(seamm.Node):
     def git_revision(self):
         """The git version of this module."""
         return vasp_step.__git_revision__
+
+    @property
+    def to_VASP_order(self):
+        """Translation of atoms from SEAMM to VASP order."""
+        if len(self._to_VASP_order) == 0:
+            self.atom_order()
+        return self._to_VASP_order
+
+    @property
+    def to_SEAMM_order(self):
+        """Translation of atoms from VASP to SEAMM order."""
+        if len(self._to_SEAMM_order) == 0:
+            self.atom_order()
+        return self._to_SEAMM_order
+
+    @property
+    def element_count(self):
+        """Numbers of atoms of each element."""
+        if len(self._element_count) == 0:
+            self.atom_order()
+        return self._element_count
+
+    def atom_order(self):
+        """Get the coordinate information for VASP (POSCAR file)."""
+        system, configuration = self.get_system_configuration()
+
+        # Prepare to reorder the atoms into descending atomic number
+        atnos = configuration.atoms.atomic_numbers
+        unique_atnos = sorted(list(set(atnos)), reverse=True)
+
+        # The dictionary to translate to/from the VASP order
+        self._to_VASP_order = []
+        self._to_SEAMM_order = []
+        self._element_count = {atno: 0 for atno in atnos}
+        for atno in atnos:
+            self._element_count[atno] += 1
+        n = 0
+        offset = {}
+        for atno in unique_atnos:
+            offset[atno] = n
+            n += self._element_count[atno]
+        self._to_SEAMM_order = [-1] * len(atnos)
+        for original, atno in enumerate(atnos):
+            new = offset[atno]
+            self._to_VASP_order.append(new)
+            self._to_SEAMM_order[new] = original
+            offset[atno] += 1
 
     def description_text(self, P=None):
         """Create the text description of what this step will do.
@@ -293,30 +343,36 @@ class Energy(seamm.Node):
 
         text += "The numerical k-mesh for integration in reciprocal space"
         text += " will be"
-        if self.is_expr(centering):
-            pass
-        elif "Monkhorst" in centering:
-            text += " a Monkhorst-Pack grid"
+        if "point" in method:
+            text += " just the 𝚪-point."
         else:
-            text += " a {centering} grid"
-        if self.is_expr(method):
-            text += " determined at run time by {k-grid method}."
-            text += " If the grid is given explicitly it will be {na} x {nb}"
-            text += " x {nc}. Otherwise it will be determined using a spacing"
-            text += " of {k-spacing}"
-            if isinstance(odd, bool) and odd:
-                text += " with the dimensions forced to odd numbers."
-        elif "spacing" in method:
-            text += " determined using a spacing of {k-spacing}"
-            if self.is_expr(odd):
-                text += ". {odd grid} will determine if the grid dimensions are"
-                text += " forced to be odd numbers."
-            elif isinstance(odd, bool) and odd:
-                text += " with the dimensions forced to odd numbers."
-        else:
-            text += " given explicitly as {na} x {nb} x {nc}."
+            if self.is_expr(centering):
+                pass
+            elif "Monkhorst" in centering:
+                text += " a Monkhorst-Pack grid"
+            else:
+                text += " a {centering} grid"
+            if self.is_expr(method):
+                text += " determined at run time by {k-grid method}."
+                text += " If the grid is given explicitly it will be {na} x {nb}"
+                text += " x {nc}. Otherwise it will be determined using a spacing"
+                text += " of {k-spacing}"
+                if isinstance(odd, bool) and odd:
+                    text += " with the dimensions forced to odd numbers."
+            elif "spacing" in method:
+                text += " determined using a spacing of {k-spacing}"
+                if self.is_expr(odd):
+                    text += ". {odd grid} will determine if the grid dimensions are"
+                    text += " forced to be odd numbers."
+                elif isinstance(odd, bool) and odd:
+                    text += " with the dimensions forced to odd numbers."
+            else:
+                text += " given explicitly as {na} x {nb} x {nc}."
 
-        return self.header + "\n" + __(text, **P, indent=4 * " ").__str__()
+        if self._calculation == "Energy":
+            return self.header + "\n" + __(text, **P, indent=4 * " ").__str__()
+        else:
+            return __(text, **P, indent=4 * " ").__str__()
 
     def run(self):
         """Run a Energy step.
@@ -375,14 +431,24 @@ class Energy(seamm.Node):
                 n_threads = 1
             if seamm_options["ncores"] != "available":
                 n_threads = min(n_threads, int(seamm_options["ncores"]))
+
+            np = P["np"]
+            if np != "available" and np < n_threads:
+                printer.important(
+                    self.indent + f"    There are {n_threads} cores available; however,"
+                    f" VASP will use {np} MPI processes as requested."
+                )
+                n_threads = np
+            else:
+                printer.important(
+                    self.indent + f"    VASP will use {n_threads} MPI processes."
+                )
+            printer.important("")
             ce["NTASKS"] = n_threads
             self.logger.debug(f"VASP will use {n_threads} threads.")
 
             files = self.get_input(P)
 
-            printer.important(
-                self.indent + f"    VASP will use {n_threads} MPI processes."
-            )
             input_only = P["input only"]
             if input_only:
                 # Just write the input files and stop
@@ -518,7 +584,16 @@ class Energy(seamm.Node):
 
         return next_node
 
-    def analyze(self, P=None, configuration=None, indent="", table=None, **kwargs):
+    def analyze(
+        self,
+        P=None,
+        configuration=None,
+        indent="",
+        text="",
+        table=None,
+        results={},
+        **kwargs,
+    ):
         """Do any analysis of the output from this step.
 
         Also print important results to the local step.out file using
@@ -529,8 +604,6 @@ class Energy(seamm.Node):
         indent: str
             An extra indentation for the output
         """
-        text = ""
-        results = {}
         data_file = self.wd / "vaspout.h5"
         with h5py.File(data_file, "r") as hdf5:
             results["model"] = self.model
@@ -544,8 +617,8 @@ class Energy(seamm.Node):
             results["energy"] = E
 
             tmp = section["forces"][...]
-            dE = (-tmp[-1]).tolist()
-            results["gradients"] = dE
+            dE = -tmp[-1]
+            results["gradients"] = dE.tolist()
 
             # VASP gives force on cell = -stress
             tmp = section["stress"]
@@ -567,8 +640,16 @@ class Energy(seamm.Node):
         results["alpha"] = alpha
         results["beta"] = beta
         results["gamma"] = gamma
+        results["V"] = cell.volume
 
-        metadata = vasp_step.metadata["results"]
+        # What is dE and how do we get the norm and max of forces on the atoms?
+        norm = LA.norm(dE, axis=1)
+        rms = np.sqrt(np.sum(norm**2) / 3)
+        maximum = max(norm)
+
+        results["RMS atom force"] = rms
+        results["maximum atom force"] = maximum
+
         if table is None:
             table = {
                 "Property": [],
@@ -576,11 +657,14 @@ class Energy(seamm.Node):
                 "Units": [],
             }
 
+        metadata = vasp_step.metadata["results"]
         for key, title in (
-            ("model", "model"),
             ("energy", "E"),
             ("Gelec", "Gelec"),
+            ("RMS atom force", "RMS force"),
+            ("maximum atom force", "Maximum force"),
             ("P", "P"),
+            ("V", "V"),
             ("a", "a"),
             ("b", "b"),
             ("c", "c"),
@@ -596,19 +680,20 @@ class Energy(seamm.Node):
             units = tmp["units"]
             table["Property"].append(title)
             table["Value"].append(f"{results[key]:{fmt}}")
-            table["Units"].append(units)
+            table["Units"].append(units.replace("^3", "\N{SUPERSCRIPT THREE}"))
 
         tmp = tabulate(
             table,
             headers="keys",
             tablefmt="rounded_outline",
-            colalign=("center", "decimal", "left"),
+            colalign=("center", "decimal", "center"),
             disable_numparse=True,
         )
         length = len(tmp.splitlines()[0])
         text_lines = []
         header = "Results"
         text_lines.append(header.center(length))
+        text_lines.append(self.model.center(length))
         text_lines.append(tmp)
 
         if text != "":
@@ -616,6 +701,7 @@ class Energy(seamm.Node):
             text += "\n\n"
         text += textwrap.indent("\n".join(text_lines), self.indent + 7 * " ")
         printer.normal(text)
+        printer.normal("")
 
         # Store the results as requested
         self.store_results(
@@ -668,21 +754,6 @@ class Energy(seamm.Node):
 
         descriptions = {}
         keywords = {}
-        keywords["NCORE"] = P["ncore"]
-        keywords["LPLANE"] = ".True." if P["lplane"] else ".False."
-        keywords["LREAL"] = "Auto" if P["lreal"] else ".False."
-        keywords["LH5"] = ".True."
-        keywords["IBRION"] = -1
-        keywords["NSW"] = 0
-        keywords["NELM"] = P["nelm"]
-        keywords["EDIFF"] = f'{P["ediff"]:.2E}'
-        efermi = P["efermi"]
-        if "middle" in efermi:
-            keywords["EFERMI"] = "MIDGAP"
-        elif efermi == "legacy":
-            keywords["EFERMI"] = "Legacy"
-        else:
-            keywords["EFERMI"] = efermi.m_as("eV")
 
         # The DFT functional
         model = P["model"]
@@ -711,7 +782,7 @@ class Energy(seamm.Node):
         # Non-spherical contributions in PAWs
         keywords["LASPH"] = ".True." if P["nonspherical PAW"] else ".False."
 
-        # The energy cuttoff, which may be an expression of ENMAX
+        # The energy cutoff, which may be an expression of ENMAX
         encut = P["plane-wave cutoff"]
         if isinstance(encut, str):
             global_dict = {**seamm.flowchart_variables._data}
@@ -724,6 +795,9 @@ class Energy(seamm.Node):
 
         # Electronic optimization algorithm
         keywords["ALGO"] = P["electronic method"].title().replace(" ", "")
+        keywords["NELM"] = P["nelm"]
+        keywords["NELMIN"] = 2 if P["nelmin"] == "default" else P["nelmin"]
+        keywords["EDIFF"] = f'{P["ediff"]:.2E}'
 
         # Smearing
         _type = P["occupation type"].lower()
@@ -753,9 +827,41 @@ class Energy(seamm.Node):
             sigma = P["smearing width"].m_as("eV")
             keywords["SIGMA"] = f"{sigma:.2f}"
 
+        # The definition of the type of calculation: SPE
+        keywords["IBRION"] = -1
+        match P["calculate stress"]:
+            case "no":
+                isif = 0
+            case "only pressure":
+                isif = 1
+            case _:
+                isif = 2
+        keywords["ISIF"] = isif
+        keywords["NSW"] = 0
+        efermi = P["efermi"]
+        if "middle" in efermi:
+            keywords["EFERMI"] = "MIDGAP"
+        elif efermi == "legacy":
+            keywords["EFERMI"] = "Legacy"
+        else:
+            keywords["EFERMI"] = efermi.m_as("eV")
+
+        # Use the HDF5 output files
+        keywords["LH5"] = ".True."
+
         # Calculate on-site density and spin
         if P["lorbit"]:
             keywords["LORBIT"] = 11
+
+        # Parameters controlling the performance
+        keywords["NCORE"] = P["ncore"]
+        keywords["KPAR"] = P["kpar"]
+        keywords["LPLANE"] = ".True." if P["lplane"] else ".False."
+        keywords["LREAL"] = "Auto" if P["lreal"] else ".False."
+        keywords["NSIM"] = P["nsim"]
+        keywords["LSCALAPACK"] = ".True." if P["lscalapack"] else ".False."
+        if P["lscalapack"]:
+            keywords["LSCALU"] = ".True." if P["lscalu"] else ".False."
 
         # Replace and add any extra keywords the user has specified
         # The values look like 'key=value'
@@ -800,8 +906,14 @@ class Energy(seamm.Node):
         _, configuration = self.get_system_configuration()
 
         lines = []
-        if "explicit" in P["k-grid method"]:
+        if "point" in P["k-grid method"]:
+            lines.append("𝚪-point only")
+            na = nb = nc = 1
+        elif "explicit" in P["k-grid method"]:
             lines.append("Explicit k-point mesh")
+            na = P["na"]
+            nb = P["nb"]
+            nc = P["nc"]
         else:
             lengths = configuration.cell.reciprocal_lengths()
             spacing = P["k-spacing"].to("1/Å").magnitude
@@ -818,7 +930,7 @@ class Energy(seamm.Node):
 
         lines.append("0")
         centering = P["centering"]
-        if "Monkhorst" in centering:
+        if "Monkhorst" in centering and "point" not in P["k-grid method"]:
             lines.append("Monkhorst-Pack")
         else:
             lines.append("Gamma")
@@ -830,28 +942,6 @@ class Energy(seamm.Node):
     def get_POSCAR(self, P=None):
         """Get the coordinate information for VASP (POSCAR file)."""
         system, configuration = self.get_system_configuration()
-
-        # Prepare to reorder the atoms into descending atomic number
-        atnos = configuration.atoms.atomic_numbers
-        unique_atnos = sorted(list(set(atnos)), reverse=True)
-        unique_elements = molsystem.elements.to_symbols(unique_atnos)
-
-        # The dictionarie to translate to/from the VASP order
-        self._to_VASP_order = {}
-        self._to_SEAMM_order = {}
-        count = {atno: 0 for atno in atnos}
-        for atno in atnos:
-            count[atno] += 1
-        n = 0
-        offset = {}
-        for atno in unique_atnos:
-            offset[atno] = n
-            n += count[atno]
-        for original, atno in enumerate(atnos):
-            new = offset[atno]
-            self._to_VASP_order[original] = new
-            self._to_SEAMM_order[new] = original
-            offset[atno] += 1
 
         # And finally make the POSCAR file contents
         lines = []
@@ -884,10 +974,14 @@ class Energy(seamm.Node):
             lines.append(f"{a:12.6f} {b:12.6f} {c:12.6f}")
 
         # Species and number of each
+        atnos = configuration.atoms.atomic_numbers
+        unique_atnos = sorted(list(set(atnos)), reverse=True)
+        unique_elements = molsystem.elements.to_symbols(unique_atnos)
+
         tmp = [f"{el:>3s}" for el in unique_elements]
         lines.append(" ".join(tmp))
 
-        tmp = [f"{count[atno]:3d}" for atno in unique_atnos]
+        tmp = [f"{self.element_count[atno]:3d}" for atno in unique_atnos]
         lines.append(" ".join(tmp))
 
         # Coordinates
@@ -897,7 +991,7 @@ class Energy(seamm.Node):
         )
         n = len(self._to_SEAMM_order)
         for i_vasp in range(n):
-            i_seamm = self._to_SEAMM_order[i_vasp]
+            i_seamm = self.to_SEAMM_order[i_vasp]
             xyz = [f"{x:12.6f}" for x in fractionals[i_seamm]]
             lines.append(" ".join(xyz))
 

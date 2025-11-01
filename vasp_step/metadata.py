@@ -387,9 +387,23 @@ metadata["keywords"] = {
         "description": "The maximum number of electronic self-consistency steps",
         "default": 60,
     },
+    "NELMIN": {
+        "description": (
+            "The minimum number of electronic self-consistency steps. 2 is the default,"
+            " 4-8 recommended for minimization and MD"
+        ),
+        "default": "2",
+    },
     "EDIFF": {
         "description": "Convergence criterion for electronic self-consistency",
         "default": "1.0E-6",
+    },
+    "EDIFFG": {
+        "description": (
+            "Convergence criterion for optimizations: positive for energy (eV) or "
+            "negative for forces [(eV/Å)^2]"
+        ),
+        "default": "-1.0E-06",
     },
     "EFERMI": {
         "description": "Defines how the Fermi energy is calculated, or gives the value",
@@ -459,6 +473,44 @@ metadata["keywords"] = {
             " (.False.)"
         ),
         "default": "Auto",
+    },
+    "NSIM": {
+        "description": (
+            "Number of bands to optimize simultaneously when using RMM-DIIS or"
+            "the blocked Davidson algorithm (NSIM)"
+        ),
+        "default": 4,
+    },
+    "LSCALAPACK": {
+        "description": "Use ScaLAPACK for orthonormalization and subspace rotations.",
+        "default": ".True.",
+    },
+    "LSCALU": {
+        "description": "Use ScaLAPACK for the subspace rotations.",
+        "default": ".False.",
+    },
+    "ISIF": {
+        "description": (
+            "Determines whether the stress is calculated, and degrees of freedom."
+        ),
+        "default": 3,
+    },
+    "POTIM": {
+        "description": "Scaling factor for the step in optimization; timestep for MD",
+        "default": 0,
+    },
+    "NFREE": {
+        "description": (
+            "Number of remembered steps for RMM-DIIS, or displacements in frozen"
+            " phonon calculations."
+        ),
+        "default": 7,
+    },
+    "SMASS": {
+        "description": (
+            "Damping or quenching factor in damped MD; ensemble in normal MD (-3=NVE,"
+            " -1=T annealing, >=0 Nosé mass)"
+        ),
     },
 }
 
@@ -561,15 +613,23 @@ metadata["results"] = {
         "dimensionality": "scalar",
         "property": "pressure#VASP#{model}",
         "type": "float",
-        "units": "Mbar",
+        "units": "kbar",
         "format": ".3f",
+    },
+    "V": {
+        "description": "volume",
+        "dimensionality": "scalar",
+        "property": "volume#VASP#{model}",
+        "type": "float",
+        "units": "Å^3",
+        "format": ".1f",
     },
     "stress": {
         "description": "stress",
         "dimensionality": "[3, 3]",
         "property": "stress#VASP#{model}",
         "type": "float",
-        "units": "Mbar",
+        "units": "kbar",
         "format": ".3f",
     },
     "a": {
@@ -623,6 +683,7 @@ metadata["results"] = {
     "RMS atom force": {
         "description": "the RMS force on the atoms",
         "dimensionality": "scalar",
+        "property": "RMS atom force#VASP#{model}",
         "type": "float",
         "units": "eV/Å",
         "format": ".3f",
@@ -638,6 +699,7 @@ metadata["results"] = {
     "maximum atom force": {
         "description": "the maximum force on an atom",
         "dimensionality": "scalar",
+        "property": "maximum atom force#VASP#{model}",
         "type": "float",
         "units": "eV/Å",
         "format": ".3f",

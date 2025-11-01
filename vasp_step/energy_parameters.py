@@ -88,13 +88,13 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
         },
         "calculate stress": {
             "default": "yes",
-            "kind": "boolean",
+            "kind": "enumeration",
             "default_units": "",
-            "enumeration": ("yes", "no"),
+            "enumeration": ("no", "only pressure", "yes"),
             "format_string": "",
-            "description": "Calculate stress:",
+            "description": "Calculate stress tensor:",
             "help_text": (
-                "Whether to calculate the stress in a single-point calculation."
+                "Whether to calculate the stress tensor, the pressure, or neither."
             ),
         },
         # Convergence and precision parameters
@@ -108,6 +108,18 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "help_text": (
                 "Maximum number of steps for the selfconsistent electronic"
                 " minimization."
+            ),
+        },
+        "nelmin": {
+            "default": "default",
+            "kind": "integer",
+            "default_units": "",
+            "enumeration": ("default",),
+            "format_string": "",
+            "description": "Minimum electronic iterations:",
+            "help_text": (
+                "Minimum number of steps for the selfconsistent electronic"
+                " minimization. The default is 6 for minimization and MD, 2 otherwise."
             ),
         },
         "ediff": {
@@ -124,7 +136,8 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "kind": "enumeration",
             "default_units": "",
             "enumeration": (
-                "normal" "fast",
+                "normal",
+                "fast",
                 "very fast",
                 "conjugate",
                 "damped",
@@ -135,13 +148,22 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "help_text": "The algorithm used tp minimize the electronic energy.",
         },
         # Performance
+        "np": {
+            "default": "available",
+            "kind": "integer",
+            "default_units": "",
+            "enumeration": ("available",),
+            "format_string": "",
+            "description": "Total number of cores to use:",
+            "help_text": "The total number of cores to use.",
+        },
         "ncore": {
             "default": 2,
             "kind": "integer",
             "default_units": "",
             "enumeration": None,
             "format_string": "",
-            "description": "Cores per orbital:",
+            "description": "Cores per orbital (NCORE):",
             "help_text": "Number of cores working on each orbital (NCORE).",
         },
         "kpar": {
@@ -150,7 +172,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "default_units": "",
             "enumeration": None,
             "format_string": "",
-            "description": "Cores per k-point:",
+            "description": "Cores per k-point (KPAR):",
             "help_text": "Number of cores working on each k-point (KPAR).",
         },
         "lplane": {
@@ -159,7 +181,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "default_units": "",
             "enumeration": ("yes", "no"),
             "format_string": "",
-            "description": "Plane-wise data distribution:",
+            "description": "Plane-wise data distribution (LPLANE):",
             "help_text": (
                 "Whether to use the plane-wise data distribution, which reduces"
                 " memory bandwidth but worsens load balancing."
@@ -171,11 +193,44 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "default_units": "",
             "enumeration": ("yes", "no"),
             "format_string": "",
-            "description": "Use real space projection:",
+            "description": "Use real space projection (LREAL):",
             "help_text": (
                 "Whether to use projection operators in real space (True) or"
                 " reciprocal (False)."
             ),
+        },
+        "nsim": {
+            "default": 4,
+            "kind": "integer",
+            "default_units": "",
+            "enumeration": None,
+            "format_string": "",
+            "description": "Number of bands treated simultaneously (NSIM):",
+            "help_text": (
+                "Number of bands treated simultaneously in RMM-DIIS or blocked Davidson"
+                "methods for optimizing the wavefunction (NSIM)."
+            ),
+        },
+        "lscalapack": {
+            "default": "yes",
+            "kind": "boolean",
+            "default_units": "",
+            "enumeration": ("yes", "no"),
+            "format_string": "",
+            "description": "Use ScaLAPACK (LSCALAPACK):",
+            "help_text": (
+                "Whether to use ScaLAPACK for the orthonormalization of the orbitals"
+                " and, optionally, subspace rotations."
+            ),
+        },
+        "lscalu": {
+            "default": "no",
+            "kind": "boolean",
+            "default_units": "",
+            "enumeration": ("yes", "no"),
+            "format_string": "",
+            "description": "Use ScaLAPACK for subspace rotations (LSCALU):",
+            "help_text": "Whether to use ScaLAPACK for the subspace rotations.",
         },
         # Miscellaneous
         "efermi": {
@@ -334,7 +389,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "default": "grid spacing",
             "kind": "string",
             "default_units": "",
-            "enumeration": ("grid spacing", "explicit grid dimensions"),
+            "enumeration": ("𝚪-point", "grid spacing", "explicit grid dimensions"),
             "format_string": "",
             "description": "Specify k-space grid using:",
             "help_text": "How to specify the k-space integration grid.",

@@ -2,11 +2,14 @@ Property,Type,Units,Description,URL
 E#VASP#{model},float,eV,"The {model} total energy (electronic + nuclear).",
 Gelec#VASP#{model},float,eV,"The {model} electronic free energy (electronic + nuclear + smearing).",
 gradients#VASP#{model},json,eV/Å,The {model} gradients,
-"pressure#LAMMPS#{model}",float,atm,"The pressure.",https://en.wikipedia.org/wiki/Pressure
-"stress#LAMMPS#{model}",json,atm,"The stress tensor.",https://en.wikipedia.org/wiki/Pressure
-"cell_a#LAMMPS#{model}",float,Å,"The cell length a.",https://en.wikipedia.org/wiki/Unit_cell
-"cell_b#LAMMPS#{model}",float,Å,"The cell length b.",https://en.wikipedia.org/wiki/Unit_cell
-"cell_c#LAMMPS#{model}",float,Å,"The cell length c.",https://en.wikipedia.org/wiki/Unit_cell
-"cell_alpha#LAMMPS#{model}",float,degree,"The cell angle alpha.",https://en.wikipedia.org/wiki/Unit_cell
-"cell_beta#LAMMPS#{model}",float,degree,"The cell angle beta.",https://en.wikipedia.org/wiki/Unit_cell
-"cell_gamma#LAMMPS#{model}",float,degree,"The cell angle gamma.",https://en.wikipedia.org/wiki/Unit_cell
+pressure#VASP#{model},float,atm,"The pressure.",https://en.wikipedia.org/wiki/Pressure
+volume#VASP#{model},float,atm,"The volume of the periodic cell.",
+stress#VASP#{model},json,atm,"The stress tensor.",https://en.wikipedia.org/wiki/Pressure
+cell_a#VASP#{model},float,Å,"The cell length a.",https://en.wikipedia.org/wiki/Unit_cell
+cell_b#VASP#{model},float,Å,"The cell length b.",https://en.wikipedia.org/wiki/Unit_cell
+cell_c#VASP#{model},float,Å,"The cell length c.",https://en.wikipedia.org/wiki/Unit_cell
+cell_alpha#VASP#{model},float,degree,"The cell angle alpha.",https://en.wikipedia.org/wiki/Unit_cell
+cell_beta#VASP#{model},float,degree,"The cell angle beta.",https://en.wikipedia.org/wiki/Unit_cell
+cell_gamma#VASP#{model},float,degree,"The cell angle gamma.",https://en.wikipedia.org/wiki/Unit_cell
+RMS atom force#VASP#{model},float,eV/Å,"The RMS force on the atoms.",
+maximum atom force#VASP#{model},float,eV/Å,"The maximum force on an atom.",
