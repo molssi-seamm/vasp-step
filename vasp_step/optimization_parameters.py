@@ -129,7 +129,7 @@ class OptimizationParameters(EnergyParameters):  # noqa: E999
             "help_text": "The maximum number of optimization steps (NSW).",
         },
         "convergence cutoff": {
-            "default": 1.0e-03,
+            "default": 1.0e-02,
             "kind": "float",
             "default_units": "eV/Å",
             "enumeration": None,

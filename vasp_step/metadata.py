@@ -419,6 +419,10 @@ metadata["keywords"] = {
         ),
         "default": "Fast",
     },
+    "PREC": {
+        "description": "The precision of the FFT grids the real-space projections.",
+        "default": "normal",
+    },
     "ISMEAR": {
         "description": "How to set the occupancy of each orbital",
         "default": 0,
@@ -613,7 +617,7 @@ metadata["results"] = {
         "dimensionality": "scalar",
         "property": "pressure#VASP#{model}",
         "type": "float",
-        "units": "kbar",
+        "units": "GPa",
         "format": ".3f",
     },
     "V": {
@@ -626,10 +630,10 @@ metadata["results"] = {
     },
     "stress": {
         "description": "stress",
-        "dimensionality": "[3, 3]",
+        "dimensionality": "[6]",
         "property": "stress#VASP#{model}",
         "type": "float",
-        "units": "kbar",
+        "units": "GPa",
         "format": ".3f",
     },
     "a": {

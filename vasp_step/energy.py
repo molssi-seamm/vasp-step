@@ -17,6 +17,7 @@ import textwrap
 import time
 
 import h5py
+from lxml import etree
 import numpy as np
 from numpy import linalg as LA
 from cpuinfo import get_cpu_info
@@ -155,7 +156,7 @@ class Energy(seamm.Node):
 
         super().__init__(
             flowchart=flowchart,
-            title="Energy",
+            title=title,
             extension=extension,
             module=__name__,
             logger=logger,
@@ -604,51 +605,43 @@ class Energy(seamm.Node):
         indent: str
             An extra indentation for the output
         """
-        data_file = self.wd / "vaspout.h5"
-        with h5py.File(data_file, "r") as hdf5:
-            results["model"] = self.model
+        if self.calculation == "Energy":
+            # Extract the data we need from the output files.
+            hdf5_file = self.wd / "vaspout.h5"
+            xml_file = self.wd / "vasprun.xml"
+            if hdf5_file.exists():
+                results = self.parse_hdf5(hdf5_file)
+            elif xml_file.exists():
+                results = self.parse_xml(xml_file)
+            else:
+                results = {}
+                text = f"Something is very wrong! Cannot find either {hdf5_file} or "
+                text += f"{xml_file}. Did VASP fail?"
+                printer.normal(textwrap.indent(text, self.indent + 4 * " "))
+                printer.normal("")
+                return results
 
-            # Get the energies. Not yet sure why they have an initial dimension of 1
-            section = hdf5["intermediate"]["ion_dynamics"]
+        # Get the last of each property by itself
+        new = {}
+        for key, item in results.items():
+            if key.endswith(",iter") and len(item) > 0:
+                newkey = key[0:-5]
+                new[newkey] = item[-1]
+        results.update(new)
 
-            tmp = section["energies"][...]
-            Efree, E0, E = tmp[-1].tolist()
-            results["Gelec"] = Efree
-            results["energy"] = E
+        # Get the norm and max of forces on the atoms for each iteration
+        results["RMS atom force,iter"] = []
+        results["maximum atom force,iter"] = []
+        for dE in results["gradients,iter"]:
+            dE = np.array(dE)
+            norm = LA.norm(dE, axis=1)
+            rms = np.sqrt(np.sum(norm**2) / 3)
+            maximum = max(norm)
 
-            tmp = section["forces"][...]
-            dE = -tmp[-1]
-            results["gradients"] = dE.tolist()
-
-            # VASP gives force on cell = -stress
-            tmp = section["stress"]
-            S = (-tmp[-1]).tolist()
-            results["stress"] = S
-
-            P = -(S[0][0] + S[1][1] + S[2][2]) / 3
-            results["P"] = P
-
-            tmp = section["lattice_vectors"]
-            lattice = tmp[-1].tolist()
-
-        cell = molsystem.Cell(1, 1, 1, 90, 90, 90)
-        cell.from_vectors(lattice)
-        a, b, c, alpha, beta, gamma = cell.parameters
-        results["a"] = a
-        results["b"] = b
-        results["c"] = c
-        results["alpha"] = alpha
-        results["beta"] = beta
-        results["gamma"] = gamma
-        results["V"] = cell.volume
-
-        # What is dE and how do we get the norm and max of forces on the atoms?
-        norm = LA.norm(dE, axis=1)
-        rms = np.sqrt(np.sum(norm**2) / 3)
-        maximum = max(norm)
-
-        results["RMS atom force"] = rms
-        results["maximum atom force"] = maximum
+            results["RMS atom force,iter"].append(rms)
+            results["maximum atom force,iter"].append(maximum)
+        results["RMS atom force"] = results["RMS atom force,iter"][-1]
+        results["maximum atom force"] = results["maximum atom force,iter"][-1]
 
         if table is None:
             table = {
@@ -798,6 +791,7 @@ class Energy(seamm.Node):
         keywords["NELM"] = P["nelm"]
         keywords["NELMIN"] = 2 if P["nelmin"] == "default" else P["nelmin"]
         keywords["EDIFF"] = f'{P["ediff"]:.2E}'
+        keywords["PREC"] = P["precision"]
 
         # Smearing
         _type = P["occupation type"].lower()
@@ -847,7 +841,7 @@ class Energy(seamm.Node):
             keywords["EFERMI"] = efermi.m_as("eV")
 
         # Use the HDF5 output files
-        keywords["LH5"] = ".True."
+        keywords["LH5"] = ".True." if P["use hdf5 files"] else ".False."
 
         # Calculate on-site density and spin
         if P["lorbit"]:
@@ -996,3 +990,288 @@ class Energy(seamm.Node):
             lines.append(" ".join(xyz))
 
         return "\n".join(lines)
+
+    def parse_xml(self, data_file):
+        """Get the data from the vasprun.xml file."""
+        results = {}
+
+        tree = etree.parse(data_file)
+        root = tree.getroot()
+
+        results["Gelec,iter"] = []
+        results["energy,iter"] = []
+        results["gradients,iter"] = []
+        results["stress,iter"] = []
+        results["P,iter"] = []
+        results["cell,iter"] = []
+        results["a,iter"] = []
+        results["b,iter"] = []
+        results["c,iter"] = []
+        results["alpha,iter"] = []
+        results["beta,iter"] = []
+        results["gamma,iter"] = []
+        results["V,iter"] = []
+        results["fractionals,iter"] = []
+        results["nElectronicSteps,iter"] = []
+
+        tmpcell = molsystem.Cell(1, 1, 1, 90, 90, 90)
+
+        # The optimization steps, or...
+        steps = [child for child in root.iterchildren() if child.tag == "calculation"]
+        results["nOptimizationSteps"] = len(steps)
+
+        for step in steps:
+            # The number of electronic iterations per optimization step
+            results["nElectronicSteps,iter"].append(
+                len([c for c in step.iterchildren() if c.tag == "scstep"])
+            )
+
+            # The forces and stresses are in calculation/
+            arrays = {
+                v.get("name"): v
+                for v in step.iterchildren()
+                if v.tag == "varray" and "name" in v.keys()
+            }
+
+            # gradients = -forces
+            if "forces" in arrays:
+                g = []
+                for row in arrays["forces"].iterchildren():
+                    g.append([-float(f) for f in row.text.split()])
+                results["gradients,iter"].append(g)
+
+            # stresses = -stress (VASP has a different sign) in kbar = 0.1 GPa
+            if "stress" in arrays:
+                tmp = []
+                for row in arrays["stress"].iterchildren():
+                    tmp.append([-0.1 * float(f) for f in row.text.split()])
+                S = [
+                    tmp[0][0],
+                    tmp[1][1],
+                    tmp[2][2],
+                    (tmp[1][2] + tmp[2][1]) / 2,
+                    (tmp[0][2] + tmp[2][0]) / 2,
+                    (tmp[0][1] + tmp[1][0]) / 2,
+                ]
+                results["stress,iter"].append(S)
+
+                results["P,iter"].append(-(S[0] + S[1] + S[2]) / 3)
+
+            # The fractional coordinates and cell, which are under calculation/structure
+            structure = [c for c in step.iterchildren() if c.tag == "structure"][0]
+
+            # The fractional coordinates are in calculation/structure/positions
+            arrays = {
+                v.get("name"): v
+                for v in structure.iterchildren()
+                if v.tag == "varray" and "name" in v.keys()
+            }
+            if "positions" in arrays:
+                xyz = []
+                for row in arrays["positions"].iterchildren():
+                    xyz.append([float(f) for f in row.text.split()])
+                results["fractionals,iter"].append(xyz)
+            else:
+                print("Cannot find the fractionals ('positions') in this step")
+
+            # The cell, which is in calculation/structure/crystal/basis
+            crystal = [c for c in structure.iterchildren() if c.tag == "crystal"][0]
+            arrays = {
+                v.get("name"): v
+                for v in crystal.iterchildren()
+                if (v.tag == "varray" and "name" in v.keys())
+            }
+            if "basis" in arrays:
+                vectors = []
+                for row in arrays["basis"].iterchildren():
+                    vectors.append([float(f) for f in row.text.split()])
+                tmpcell.from_vectors(vectors)
+                results["cell,iter"].append(tmpcell.parameters)
+                a, b, c, alpha, beta, gamma = tmpcell.parameters
+                results["a,iter"].append(a)
+                results["b,iter"].append(b)
+                results["c,iter"].append(c)
+                results["alpha,iter"].append(alpha)
+                results["beta,iter"].append(beta)
+                results["gamma,iter"].append(gamma)
+                results["V,iter"].append(tmpcell.volume)
+            else:
+                print("Cannot find the cell vectors ('basis') in this step")
+
+            # The energies are in calculation/energy
+            energy = [c for c in step.iterchildren() if c.tag == "energy"][0]
+            arrays = {
+                v.get("name"): v
+                for v in energy.iterchildren()
+                if v.tag == "i" and "name" in v.keys()
+            }
+            if "e_fr_energy" in arrays:
+                results["Gelec,iter"].append(float(arrays["e_fr_energy"].text.strip()))
+            if "e_0_energy" in arrays:
+                results["energy,iter"].append(float(arrays["e_0_energy"].text.strip()))
+
+        return results
+
+    def parse_hdf5(self, data_file):
+        """Get the data from the vaspout.h5 file."""
+        results = {}
+
+        results["Gelec,iter"] = []
+        results["energy,iter"] = []
+        results["gradients,iter"] = []
+        results["stress,iter"] = []
+        results["P,iter"] = []
+        results["cell,iter"] = []
+        results["a,iter"] = []
+        results["b,iter"] = []
+        results["c,iter"] = []
+        results["alpha,iter"] = []
+        results["beta,iter"] = []
+        results["gamma,iter"] = []
+        results["V,iter"] = []
+        results["fractionals,iter"] = []
+        # results["nElectronicSteps,iter"] = []
+
+        tmpcell = molsystem.Cell(1, 1, 1, 90, 90, 90)
+
+        with h5py.File(data_file, "r") as hdf5:
+            results["model"] = self.model
+
+            # Get the energies. Not yet sure why they have an initial dimension of 1
+            section = hdf5["intermediate"]["ion_dynamics"]
+
+            tmp = section["energies"][...].tolist()
+            results["nOptimizationSteps"] = len(tmp)
+            for Efree, E0, E in tmp:
+                results["Gelec,iter"].append(Efree)
+                results["energy,iter"].append(E)
+
+            # Gradients are negative of forces
+            results["gradients,iter"] = (-section["forces"][...]).tolist()
+
+            # VASP gives force on cell = -stress in kbar = 0.1 GPa
+            S = [
+                [
+                    tmp[0][0],
+                    tmp[1][1],
+                    tmp[2][2],
+                    (tmp[1][2] + tmp[2][1]) / 2,
+                    (tmp[0][2] + tmp[2][0]) / 2,
+                    (tmp[0][1] + tmp[1][0]) / 2,
+                ]
+                for tmp in (-0.1 * section["stress"][...]).tolist()
+            ]
+            results["stress,iter"] = S
+
+            results["P,iter"] = [
+                -(S[0] + S[1] + S[2]) / 3 for S in results["stress,iter"]
+            ]
+
+            results["fractionals,iter"] = section["position_ions"][...].tolist()
+
+            for vectors in section["lattice_vectors"][...].tolist():
+                tmpcell.from_vectors(vectors)
+                results["cell,iter"].append(tmpcell.parameters)
+                a, b, c, alpha, beta, gamma = tmpcell.parameters
+                results["a,iter"].append(a)
+                results["b,iter"].append(b)
+                results["c,iter"].append(c)
+                results["alpha,iter"].append(alpha)
+                results["beta,iter"].append(beta)
+                results["gamma,iter"].append(gamma)
+                results["V,iter"].append(tmpcell.volume)
+
+        return results
+
+    def plot(self, E_units="", F_units=""):
+        """Generate a plot of the convergence of the geometry optimization."""
+        figure = self.create_figure(
+            module_path=("seamm",),
+            template="line.graph_template",
+            title="Geometry optimization convergence",
+        )
+        plot = figure.add_plot("convergence")
+
+        x_axis = plot.add_axis("x", label="Step", start=0, stop=0.8)
+        y_axis = plot.add_axis("y", label=f"Energy ({E_units})")
+        y2_axis = plot.add_axis(
+            "y",
+            anchor=x_axis,
+            label=f"Force ({F_units})",
+            overlaying="y",
+            side="right",
+            tickmode="sync",
+        )
+        y3_axis = plot.add_axis(
+            "y",
+            anchor=None,
+            label="Distance (Å)",
+            overlaying="y",
+            position=0.9,
+            side="right",
+            tickmode="sync",
+        )
+        x_axis.anchor = y_axis
+
+        plot.add_trace(
+            color="red",
+            name="Energy",
+            width=3,
+            x=self._data["step"],
+            x_axis=x_axis,
+            xlabel="step",
+            y=self._data["energy"],
+            y_axis=y_axis,
+            ylabel="Energy",
+            yunits=E_units,
+        )
+
+        plot.add_trace(
+            color="black",
+            name="Max Force",
+            width=3,
+            x=self._data["step"],
+            x_axis=x_axis,
+            xlabel="step",
+            y=self._data["max_force"],
+            y_axis=y2_axis,
+            ylabel="Max Force",
+            yunits=F_units,
+        )
+
+        plot.add_trace(
+            color="green",
+            name="RMS Force",
+            width=3,
+            x=self._data["step"],
+            x_axis=x_axis,
+            xlabel="step",
+            y=self._data["rms_force"],
+            y_axis=y2_axis,
+            ylabel="RMS Force",
+            yunits=F_units,
+        )
+
+        plot.add_trace(
+            color="blue",
+            name="Max Step",
+            width=3,
+            x=self._data["step"],
+            x_axis=x_axis,
+            xlabel="step",
+            y=self._data["max_step"],
+            y_axis=y3_axis,
+            ylabel="Max Step",
+            yunits="Å",
+        )
+
+        figure.grid_plots("convergence")
+
+        # Write to disk
+        path = Path(self.directory) / "Convergence.graph"
+        figure.dump(path)
+
+        if "html" in self.options and self.options["html"]:
+            path = Path(self.directory) / "Convergence.html"
+            figure.template = "line.html_template"
+            figure.dump(path)

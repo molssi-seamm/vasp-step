@@ -2,9 +2,9 @@ Property,Type,Units,Description,URL
 E#VASP#{model},float,eV,"The {model} total energy (electronic + nuclear).",
 Gelec#VASP#{model},float,eV,"The {model} electronic free energy (electronic + nuclear + smearing).",
 gradients#VASP#{model},json,eV/Å,The {model} gradients,
-pressure#VASP#{model},float,atm,"The pressure.",https://en.wikipedia.org/wiki/Pressure
-volume#VASP#{model},float,atm,"The volume of the periodic cell.",
-stress#VASP#{model},json,atm,"The stress tensor.",https://en.wikipedia.org/wiki/Pressure
+pressure#VASP#{model},float,GPa,"The pressure.",https://en.wikipedia.org/wiki/Pressure
+volume#VASP#{model},float,Å^3,"The volume of the periodic cell.",
+stress#VASP#{model},json,GPa,"The stress tensor.",https://en.wikipedia.org/wiki/Pressure
 cell_a#VASP#{model},float,Å,"The cell length a.",https://en.wikipedia.org/wiki/Unit_cell
 cell_b#VASP#{model},float,Å,"The cell length b.",https://en.wikipedia.org/wiki/Unit_cell
 cell_c#VASP#{model},float,Å,"The cell length c.",https://en.wikipedia.org/wiki/Unit_cell

@@ -7,7 +7,6 @@ from pathlib import Path
 import pkg_resources
 import textwrap
 
-import h5py
 from tabulate import tabulate
 
 import vasp_step
@@ -88,7 +87,7 @@ class Optimization(vasp_step.Energy):
 
         super().__init__(
             flowchart=flowchart,
-            title="Optimization",
+            title=title,
             extension=extension,
             logger=logger,
         )
@@ -254,6 +253,9 @@ class Optimization(vasp_step.Energy):
                 keywords["POTIM"] = 2 * (1 - float(P["velocity scale factor"]))
             else:
                 keywords["POTIM"] = -float(P["velocity quenching factor"])
+        else:  # Conjugate gradients
+            keywords["IBRION"] = 2
+            keywords["POTIM"] = P["step scale factor"]
 
         # Work out ISIF
         xyz = P["optimize atom positions"]
@@ -289,6 +291,10 @@ class Optimization(vasp_step.Energy):
                     raise RuntimeError("Not optimizing any degrees of freedom!")
         keywords["ISIF"] = isif
 
+        # Check for default for NELMIN and set if needed
+        if P["nelmin"] == "default":
+            keywords["NELMIN"] = 6
+
         return keywords, descriptions
 
     def analyze(
@@ -311,7 +317,6 @@ class Optimization(vasp_step.Energy):
         indent: str
             An extra indentation for the output
         """
-        results = {}
         if table is None:
             table = {
                 "Property": [],
@@ -320,68 +325,28 @@ class Optimization(vasp_step.Energy):
             }
 
         # Extract the data we need from the output files.
-        data_file = self.wd / "vaspout.h5"
-        with h5py.File(data_file, "r") as hdf5:
-            results["model"] = self.model
-
-            # Get the energies. Not yet sure why they have an initial dimension of 1
-            section = hdf5["intermediate"]["ion_dynamics"]
-
-            tmp = section["energies"][...]
-            Git = []
-            Eit = []
-            for Efree, E0, E in tmp.tolist():
-                Git.append(Efree)
-                Eit.append(E)
-            results["Gelec,iter"] = Git
-            results["energy,iter"] = Eit
-            results["nOptimizationSteps"] = len(Git)
-
-            tmp = section["forces"][...]
-            dE = -tmp[:]
-            results["gradients,iter"] = dE.tolist()
-
-            # VASP gives force on cell = -stress
-            tmp = section["stress"]
-            Sit = (-tmp[:]).tolist()
-            results["stress,iter"] = Sit
-
-            P = []
-            for S in Sit:
-                P.append(-(S[0][0] + S[1][1] + S[2][2]) / 3)
-            results["P,iter"] = P
-
-            latit = section["lattice_vectors"][:].tolist()
-            fractionals = section["position_ions"][:]
-
-        tmpcell = molsystem.Cell(1, 1, 1, 90, 90, 90)
-
-        results["a,iter"] = []
-        results["b,iter"] = []
-        results["c,iter"] = []
-        results["alpha,iter"] = []
-        results["beta,iter"] = []
-        results["gamma,iter"] = []
-        results["V,iter"] = []
-        for lattice in latit:
-            tmpcell.from_vectors(lattice)
-            a, b, c, alpha, beta, gamma = tmpcell.parameters
-            results["a,iter"].append(a)
-            results["b,iter"].append(b)
-            results["c,iter"].append(c)
-            results["alpha,iter"].append(alpha)
-            results["beta,iter"].append(beta)
-            results["gamma,iter"].append(gamma)
-            results["V,iter"].append(tmpcell.volume)
+        hdf5_file = self.wd / "vaspout.h5"
+        xml_file = self.wd / "vasprun.xml"
+        if hdf5_file.exists():
+            results = self.parse_hdf5(hdf5_file)
+        elif xml_file.exists():
+            results = self.parse_xml(xml_file)
+        else:
+            results = {}
+            text = f"Something is very wrong! Cannot find either {hdf5_file} or "
+            text += f"{xml_file}. Did VASP fail?"
+            printer.normal(textwrap.indent(text, self.indent + 4 * " "))
+            printer.normal("")
+            return results
 
         table["Property"].append("Number of steps")
         table["Value"].append(results["nOptimizationSteps"])
         table["Units"].append("")
 
         # Update the configuration with the final cell and fractionals
-        configuration.cell.from_vectors(latit[-1])
+        configuration.cell.parameters = results["cell,iter"][-1]
         # Reorder the atoms back to SEAMM order
-        tmp = fractionals[-1].tolist()
+        tmp = results["fractionals,iter"][-1]
         configuration.atoms.coordinates = [tmp[i] for i in self.to_VASP_order]
 
         super().analyze(
@@ -395,12 +360,10 @@ class Optimization(vasp_step.Energy):
         )
 
         # Print the change in the cell
-        tmpcell.from_vectors(latit[0])
-        a0, b0, c0, alpha0, beta0, gamma0 = tmpcell.parameters
-        V0 = tmpcell.volume
-        tmpcell.from_vectors(latit[-1])
-        a, b, c, alpha, beta, gamma = tmpcell.parameters
-        V = tmpcell.volume
+        a0, b0, c0, alpha0, beta0, gamma0 = results["cell,iter"][0]
+        V0 = results["V,iter"][0]
+        a, b, c, alpha, beta, gamma = results["cell,iter"][-1]
+        V = results["V,iter"][-1]
         ctable = {
             "": ("𝗮", "𝗯", "𝗰", "𝞪", "𝞫", "𝞬", "V"),
             "Initial": (
@@ -449,22 +412,8 @@ class Optimization(vasp_step.Energy):
         printer.normal("")
 
         # Print the change in the stress
-        S0 = Sit[0]
-        xx0 = S0[0][0]
-        yy0 = S0[1][1]
-        zz0 = S0[2][2]
-        yz0 = (S0[1][2] + S0[2][1]) / 2
-        xz0 = (S0[0][2] + S0[2][0]) / 2
-        xy0 = (S0[0][1] + S0[1][0]) / 2
-
-        S = Sit[-1]
-        xx = S[0][0]
-        yy = S[1][1]
-        zz = S[2][2]
-        yz = (S[1][2] + S[2][1]) / 2
-        xz = (S[0][2] + S[2][0]) / 2
-        xy = (S[0][1] + S[1][0]) / 2
-
+        (xx0, yy0, zz0, yz0, xz0, xy0) = results["stress,iter"][0]
+        (xx, yy, zz, yz, xz, xy) = results["stress,iter"][-1]
         ctable = {
             "": ("xx", "yy", "zz", "yz", "xz", "xy"),
             "Initial": (
@@ -491,7 +440,7 @@ class Optimization(vasp_step.Energy):
                 f"{xz - xz0:.4f}",
                 f"{xy - xy0:.4f}",
             ),
-            "Units": ("kbar",) * 6,
+            "Units": ("GPa",) * 6,
         }
 
         tmp = tabulate(
