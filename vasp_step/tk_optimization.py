@@ -88,7 +88,7 @@ class TkOptimization(TkEnergy):
             h=h,
         )
 
-    def create_dialog(self):
+    def create_dialog(self, title="Optimization"):
         """
         Create the dialog. A set of widgets will be chosen by default
         based on what is specified in the Optimization_parameters
@@ -107,7 +107,7 @@ class TkOptimization(TkEnergy):
         TkOptimization.reset_dialog
         """
 
-        super().create_dialog(title="Optimization")
+        super().create_dialog(title=title)
 
         # Shortcut for parameters
         P = self.node.parameters

@@ -123,7 +123,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             ),
         },
         "ediff": {
-            "default": 1.0e-6,
+            "default": 1.0e-5,
             "kind": "float",
             "default_units": "",
             "enumeration": None,
@@ -146,6 +146,15 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "format_string": "",
             "description": "Electronic minimization method:",
             "help_text": "The algorithm used tp minimize the electronic energy.",
+        },
+        "precision": {
+            "default": "normal",
+            "kind": "enumeration",
+            "default_units": "",
+            "enumeration": ("single", "normal", "accurate"),
+            "format_string": "",
+            "description": "Precision of FFT grids and projections:",
+            "help_text": "The precision of the FFT grids the real-space projections.",
         },
         # Performance
         "np": {
@@ -353,7 +362,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "help_text": "The maximum energy cutoff in the specified potentials.",
         },
         "spin polarization": {
-            "default": "collinear",
+            "default": "none",
             "kind": "string",
             "default_units": "",
             "enumeration": ("none", "collinear", "noncollinear"),

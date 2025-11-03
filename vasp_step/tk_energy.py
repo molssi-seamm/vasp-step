@@ -1080,7 +1080,7 @@ class TkEnergy(seamm.TkNode):
         # Then create the widgets and place them
         row = 0
         widgets = []
-        for key in ("electronic method", "nelm", "nelmin", "ediff"):
+        for key in ("electronic method", "nelm", "nelmin", "ediff", "precision"):
             w = self[key] = P[key].widget(scf_frame)
             w.grid(row=row, column=0, sticky="ew")
             row += 1
