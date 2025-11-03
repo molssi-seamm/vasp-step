@@ -330,7 +330,7 @@ class Optimization(vasp_step.Energy):
         if hdf5_file.exists():
             results = self.parse_hdf5(hdf5_file)
         elif xml_file.exists():
-            results = self.parse_xml(hdf5_file)
+            results = self.parse_xml(xml_file)
         else:
             results = {}
             text = f"Something is very wrong! Cannot find either {hdf5_file} or "

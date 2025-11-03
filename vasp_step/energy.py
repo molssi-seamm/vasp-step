@@ -612,7 +612,7 @@ class Energy(seamm.Node):
             if hdf5_file.exists():
                 results = self.parse_hdf5(hdf5_file)
             elif xml_file.exists():
-                results = self.parse_xml(hdf5_file)
+                results = self.parse_xml(xml_file)
             else:
                 results = {}
                 text = f"Something is very wrong! Cannot find either {hdf5_file} or "
@@ -841,7 +841,7 @@ class Energy(seamm.Node):
             keywords["EFERMI"] = efermi.m_as("eV")
 
         # Use the HDF5 output files
-        keywords["LH5"] = ".True."
+        keywords["LH5"] = ".True." if P["use hdf5 files"] else ".False."
 
         # Calculate on-site density and spin
         if P["lorbit"]:
@@ -995,7 +995,6 @@ class Energy(seamm.Node):
         """Get the data from the vasprun.xml file."""
         results = {}
 
-        data_file = self.wd / "vasprun.xml"
         tree = etree.parse(data_file)
         root = tree.getroot()
 

@@ -3,6 +3,7 @@ History
 =======
 2025.11.2: Small improvements and better output.
     * Added missing precision control
+    * Added control over using HDF5 files
     * Improved the output, particularly for optimization
     * Standardized pressure and stress units to GPa
     * Changed some of the defaults to make standard calculations work better.

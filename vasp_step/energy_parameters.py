@@ -86,6 +86,20 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "description": "Write the input files and stop:",
             "help_text": "Don't run VASP. Just write the input files.",
         },
+        "use hdf5 files": {
+            "default": "no",
+            "kind": "boolean",
+            "default_units": "",
+            "enumeration": (
+                "yes",
+                "no",
+            ),
+            "format_string": "s",
+            "description": "Output to  hdf5 files:",
+            "help_text": (
+                "Use hdf5 files for the wavefunction and charge density output."
+            ),
+        },
         "calculate stress": {
             "default": "yes",
             "kind": "enumeration",
