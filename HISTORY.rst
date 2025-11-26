@@ -3,7 +3,7 @@ History
 =======
 2025.11.26: Added cohesive and formation energies, and saving gradients
     * Added an option to save the gradients in the configuration.
-    * Calculate the cohesive energy and energy of formation if tabulated  atom and
+    * Calculate the cohesive energy and energy of formation if tabulated atom and
       element energies are available for the DFT functional and planewave cutoff.
 
 2025.11.2: Small improvements and better output.
