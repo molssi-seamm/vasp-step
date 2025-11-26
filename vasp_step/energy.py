@@ -625,6 +625,7 @@ class Energy(seamm.Node):
                             writer = csv.writer(fd)
                             writer.writerow(self._timing_data)
                     except Exception:
+                        # Don't want an error with timing to be fatal
                         pass
 
         if not input_only:
@@ -906,6 +907,8 @@ class Energy(seamm.Node):
         try:
             name = configuration.PC_iupac_name(fallback=name)
         except Exception:
+            # If there is an error, just use the name so far.
+            name = name
             pass
 
         if name is None:
