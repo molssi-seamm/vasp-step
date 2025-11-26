@@ -32,7 +32,7 @@ Atomic Number,Element,Multiplicity,Term Symbol,ΔfH°(0),ΔfH°gas,StdErr,(from 
 31,Ga,2,2P1/2,,271.96,,6.55,5.57,169.03,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Ga,JANAF,,
 32,Ge,3,3P0,,372,8,7.398,4.636,167.904,0.005,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Ge,CODATA,,
 33,As,4,4S3/2,,303,,6.2,5.13,174.1,,https://www.webelements.com/scandium/thermochemistry.html,,,
-34,Se,3,3P2,,227.1,,6.199,5.52,252,,https://www.webelements.com/scandium/thermochemistry.html,,,
+34,Se,3,3P2,,227.1,,6.199,5.52,252,,https://www.webelements.com/selenium/thermochemistry.html,,,
 35,Br,2,2P3/2,,111.86,0.12,6.197,24.52,175.02,0.004,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Br,JANAF,,
 36,Kr,1,1S0,,0,,6.197,6.197,164.08,0.003,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Kr,JANAF,,
 37,Rb,2,2S1/2,,,,,,,,,,
