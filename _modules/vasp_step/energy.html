@@ -529,7 +529,7 @@
 
 
 <div class="viewcode-block" id="humanize">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.humanize">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.humanize">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">humanize</span><span class="p">(</span><span class="n">memory</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="n">kilo</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scale memory to its proper format e.g:</span>
@@ -552,7 +552,7 @@
 
 
 <div class="viewcode-block" id="dehumanize">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.dehumanize">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.dehumanize">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">dehumanize</span><span class="p">(</span><span class="n">memory</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Unscale memory from its human readable form e.g:</span>
@@ -604,7 +604,7 @@
 
 
 <div class="viewcode-block" id="subscript">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.subscript">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.subscript">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">subscript</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the number using Unicode subscript characters.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">_subscript</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span></div>
@@ -656,7 +656,7 @@
 
 
 <div class="viewcode-block" id="Energy">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Energy</span><span class="p">(</span><span class="n">seamm</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The non-graphical part of a Energy step in a flowchart.</span>
@@ -803,7 +803,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_element_count</span>
 
 <div class="viewcode-block" id="Energy.atom_order">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.atom_order">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.atom_order">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">atom_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the coordinate information for VASP (POSCAR file).&quot;&quot;&quot;</span>
         <span class="n">system</span><span class="p">,</span> <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_system_configuration</span><span class="p">()</span>
@@ -832,7 +832,7 @@
 
 
 <div class="viewcode-block" id="Energy.description_text">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.description_text">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.description_text">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">description_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the text description of what this step will do.</span>
 <span class="sd">        The dictionary of control values is passed in as P so that</span>
@@ -934,7 +934,7 @@
 
 
 <div class="viewcode-block" id="Energy.run">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.run">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a Energy step.</span>
 
@@ -1148,7 +1148,7 @@
 
 
 <div class="viewcode-block" id="Energy.analyze">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.analyze">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.analyze">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">analyze</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1285,7 +1285,7 @@
 
 
 <div class="viewcode-block" id="Energy.calculate_enthalpy_of_formation">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.calculate_enthalpy_of_formation">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.calculate_enthalpy_of_formation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">calculate_enthalpy_of_formation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the enthalpy of formation from the results of a calculation.</span>
 
@@ -1722,7 +1722,7 @@
 
 
 <div class="viewcode-block" id="Energy.get_input">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.get_input">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.get_input">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all the input for VASP&quot;&quot;&quot;</span>
 
@@ -1747,7 +1747,7 @@
 
 
 <div class="viewcode-block" id="Energy.get_INCAR">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.get_INCAR">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.get_INCAR">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_INCAR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the control input (INCAR) for this calculation.&quot;&quot;&quot;</span>
         <span class="n">keywords</span><span class="p">,</span> <span class="n">descriptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_keywords</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
@@ -1768,7 +1768,7 @@
 
 
 <div class="viewcode-block" id="Energy.get_keywords">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.get_keywords">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.get_keywords">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the keywords and values for the calculation.&quot;&quot;&quot;</span>
         <span class="c1"># Get the values of the parameters, dereferencing any variables</span>
@@ -1902,7 +1902,7 @@
 
 
 <div class="viewcode-block" id="Energy.get_POTCAR">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.get_POTCAR">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.get_POTCAR">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_POTCAR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the potential input (POTCAR) for this calculation.</span>
 
@@ -1932,7 +1932,7 @@
 
 
 <div class="viewcode-block" id="Energy.get_KPOINTS">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.get_KPOINTS">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.get_KPOINTS">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_KPOINTS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the k-point grid, KPOINTS file.&quot;&quot;&quot;</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_system_configuration</span><span class="p">()</span>
@@ -1973,7 +1973,7 @@
 
 
 <div class="viewcode-block" id="Energy.get_POSCAR">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.get_POSCAR">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.get_POSCAR">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_POSCAR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the coordinate information for VASP (POSCAR file).&quot;&quot;&quot;</span>
         <span class="n">system</span><span class="p">,</span> <span class="n">configuration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_system_configuration</span><span class="p">()</span>
@@ -2034,7 +2034,7 @@
 
 
 <div class="viewcode-block" id="Energy.parse_xml">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.parse_xml">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.parse_xml">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_file</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the data from the vasprun.xml file.&quot;&quot;&quot;</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2158,7 +2158,7 @@
 
 
 <div class="viewcode-block" id="Energy.parse_hdf5">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.parse_hdf5">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.parse_hdf5">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_hdf5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_file</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the data from the vaspout.h5 file.&quot;&quot;&quot;</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2232,7 +2232,7 @@
 
 
 <div class="viewcode-block" id="Energy.plot">
-<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.energy.Energy.plot">[docs]</a>
+<a class="viewcode-back" href="../../api/vasp_step.html#vasp_step.energy.Energy.plot">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E_units</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">F_units</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a plot of the convergence of the geometry optimization.&quot;&quot;&quot;</span>
         <span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_figure</span><span class="p">(</span>
