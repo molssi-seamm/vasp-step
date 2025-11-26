@@ -220,6 +220,7 @@ class TkOptimization(TkEnergy):
         ]
         if not shape and not volume:
             keys.append("calculate stress")
+        keys.append("save gradients")
 
         # Place in the second column
         row = 0

@@ -1,4 +1,6 @@
 Property,Type,Units,Description,URL
+DfE0#VASP#{model},float,kJ/mol,"The energy of formation.",
+Ecoh#VASP#{model},float,eV,"The cohesive energy.",
 E#VASP#{model},float,eV,"The {model} total energy (electronic + nuclear).",
 Gelec#VASP#{model},float,eV,"The {model} electronic free energy (electronic + nuclear + smearing).",
 gradients#VASP#{model},json,eV/Å,The {model} gradients,
