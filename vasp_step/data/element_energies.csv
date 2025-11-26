@@ -14,7 +14,7 @@ Atomic Number,Element,Multiplicity,Term Symbol,ΔfH°(0),ΔfH°gas,StdErr,(from 
 13,Al,2,2P1/2,,329.7,4,6.919,4.54,164.57,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Al,JANAF,,-458.892
 14,Si,3,3P0,,450,8,7.55,3.217,167.98,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Si,JANAF,-1031.191683,-576.992
 15,P,4,4S3/2,,316.39,1,6.197,5.36,163.2,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/P,JANAF,,-745.168
-16,S,3,3P2,,276.98,0.15,6.657,4.412,167.83,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Si,JANAF,,-726.739
+16,S,3,3P2,,276.98,0.15,6.657,4.412,167.83,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/S,JANAF,,-726.739
 17,Cl,2,2P3/2,,121.3,0.008,6.272,9.181,165.19,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Cl,JANAF,,-723.845
 18,Ar,1,1S0,,0,,6.197,6.197,154.84,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Ar,JANAF,,-754.817
 19,K,2,2S1/2,,89,0.8,6.197,7.088,160.34,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/K,JANAF,,-817.341
