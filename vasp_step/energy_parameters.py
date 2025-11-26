@@ -111,6 +111,15 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
                 "Whether to calculate the stress tensor, the pressure, or neither."
             ),
         },
+        "save gradients": {
+            "default": "no",
+            "kind": "boolean",
+            "default_units": "",
+            "enumeration": ("yes", "no"),
+            "format_string": "",
+            "description": "Save the gradients:",
+            "help_text": "Whether to save the gradients.",
+        },
         # Convergence and precision parameters
         "nelm": {
             "default": 60,

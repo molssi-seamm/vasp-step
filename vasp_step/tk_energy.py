@@ -1022,7 +1022,12 @@ class TkEnergy(seamm.TkNode):
         main_frame = self["main frame"] = self["scrolled frame"].interior()
 
         # Then create the widgets
-        for key in ("input only", "use hdf5 files", "calculate stress"):
+        for key in (
+            "input only",
+            "use hdf5 files",
+            "calculate stress",
+            "save gradients",
+        ):
             self[key] = P[key].widget(main_frame)
 
         # Frame to isolate widgets for the calculation definition
@@ -1037,7 +1042,7 @@ class TkEnergy(seamm.TkNode):
         # Then create the widgets and place them
         row = 0
         widgets = []
-        for key in ("calculate stress",):
+        for key in ("calculate stress", "save gradients"):
             w = self[key] = P[key].widget(calculation_frame)
             w.grid(row=row, column=0, sticky="ew")
             row += 1
