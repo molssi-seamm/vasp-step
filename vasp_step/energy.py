@@ -861,7 +861,7 @@ class Energy(seamm.Node):
             if "Reference" in personal_table.columns:
                 references = personal_table["Reference"].to_list()
             if "Term Symbol" in personal_table.columns:
-                term_symbols = personal_table["Term Symbols"].to_list()
+                term_symbols = personal_table["Term Symbol"].to_list()
         elif "ΔfH°gas" in table.columns:
             DfH0gas = table["ΔfH°gas"].to_list()
             if "Reference" in table.columns:
