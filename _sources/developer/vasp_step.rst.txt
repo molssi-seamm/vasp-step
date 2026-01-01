@@ -1,0 +1,109 @@
+vasp\_step package
+==================
+
+Submodules
+----------
+
+vasp\_step.energy module
+------------------------
+
+.. automodule:: vasp_step.energy
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.energy\_parameters module
+------------------------------------
+
+.. automodule:: vasp_step.energy_parameters
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.energy\_step module
+------------------------------
+
+.. automodule:: vasp_step.energy_step
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.metadata module
+--------------------------
+
+.. automodule:: vasp_step.metadata
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.optimization module
+------------------------------
+
+.. automodule:: vasp_step.optimization
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.optimization\_parameters module
+------------------------------------------
+
+.. automodule:: vasp_step.optimization_parameters
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.optimization\_step module
+------------------------------------
+
+.. automodule:: vasp_step.optimization_step
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.tk\_energy module
+----------------------------
+
+.. automodule:: vasp_step.tk_energy
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.tk\_optimization module
+----------------------------------
+
+.. automodule:: vasp_step.tk_optimization
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.tk\_vasp module
+--------------------------
+
+.. automodule:: vasp_step.tk_vasp
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.vasp module
+----------------------
+
+.. automodule:: vasp_step.vasp
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+vasp\_step.vasp\_step module
+----------------------------
+
+.. automodule:: vasp_step.vasp_step
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: vasp_step
+   :members:
+   :show-inheritance:
+   :undoc-members:
