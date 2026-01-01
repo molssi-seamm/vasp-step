@@ -1,6 +1,9 @@
 =======
 History
 =======
+2026.1.1: Added more reference energies for r2SCAN
+    * Added reference energies for r2SCAN for H-S and Ar
+
 2025.11.26: Added cohesive and formation energies, and saving gradients
     * Added an option to save the gradients in the configuration.
     * Calculate the cohesive energy and energy of formation if tabulated atom and

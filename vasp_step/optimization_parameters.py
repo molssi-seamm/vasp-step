@@ -101,7 +101,7 @@ class OptimizationParameters(EnergyParameters):  # noqa: E999
             "default_units": "",
             "enumeration": ("yes", "no"),
             "format_string": "",
-            "description": "Optimize the call shape:",
+            "description": "Optimize the cell shape:",
             "help_text": (
                 "Whether to allow the shape of the cell to"
                 "change during the optimization."
@@ -113,7 +113,7 @@ class OptimizationParameters(EnergyParameters):  # noqa: E999
             "default_units": "",
             "enumeration": ("yes", "no"),
             "format_string": "",
-            "description": "Optimize the call volume:",
+            "description": "Optimize the cell volume:",
             "help_text": (
                 "Whether to allow the volume of the cell to"
                 "change during the optimization."
