@@ -896,6 +896,8 @@ class Energy(seamm.Node):
         gas_atoms = " + ".join(tmp)
         tmp = []
         for atno, symbol, count in composition:
+            if symbol not in standard_state:
+                return f"Don't have the standard state for {symbol}"
             if count == 1:
                 tmp.append(standard_state[symbol])
             else:
@@ -949,6 +951,8 @@ class Energy(seamm.Node):
         Eatoms = 0.0
         Ef0 = 0.0
         for atno, symbol, count in composition:
+            if len(atom_energy) < atno or len(atom_formation_energy) < atno:
+                return f"Don't have the atom energies for {symbol}"
             Eatom = atom_energy[atno - 1]
             if isnan(Eatom):
                 # Don't have the data for this element

@@ -1,6 +1,10 @@
 =======
 History
 =======
+2026.1.28: Bugfix: protected against missing data calculating energies of formation
+    * Fixed issues with missing data when trying to calculate the energies of formation,
+      etc. Now the code notes the error and continues safely.
+
 2026.1.1: Added more reference energies for r2SCAN
     * Added reference energies for r2SCAN for H-S and Ar
 
