@@ -412,8 +412,8 @@ class Optimization(vasp_step.Energy):
         printer.normal("")
 
         # Print the change in the stress
-        (xx0, yy0, zz0, yz0, xz0, xy0) = results["stress,iter"][0]
-        (xx, yy, zz, yz, xz, xy) = results["stress,iter"][-1]
+        xx0, yy0, zz0, yz0, xz0, xy0 = results["stress,iter"][0]
+        xx, yy, zz, yz, xz, xy = results["stress,iter"][-1]
         ctable = {
             "": ("xx", "yy", "zz", "yz", "xz", "xy"),
             "Initial": (
