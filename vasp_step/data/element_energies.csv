@@ -20,7 +20,7 @@
 19,K,2,2S1/2,,89,0.8,6.197,7.088,160.34,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/K,JANAF,,-817.341,-906.341,-906.34,,-906.3367233
 20,Ca,1,1S0,,177.8,0.8,6.197,5.736,154.89,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Ca,JANAF,,-825.928,-1003.728,-1003.73,,-1037.631207
 21,Sc,2,2D3/2,,378,,7,5.22,174.7,,https://www.webelements.com/scandium/thermochemistry.html,,,,,,,
-22,Ti,3,3F2,,473.63,3,7.539,4.824,180.3,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Ti,JANAF,,,,,,
+22,Ti,3,3F2,,473.63,3,7.539,4.824,180.3,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Ti,JANAF,,,,,,-1697.911774
 23,V,4,4F3/2,,515.47,,4,4.64,182.31,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/V,JANAF,,,,,,
 24,Cr,7,7S3,,397.48,,6.2,4.6,174.31,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Cr,JANAF,,,,,,
 25,Mn,6,6S5/2,,283.26,,6.2,5,173.72,,https://webbook.nist.gov/cgi/inchi/InChI%3D1S/Mn,JANAF,,,,,,
