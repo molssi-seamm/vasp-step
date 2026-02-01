@@ -69,6 +69,10 @@ metadata["computational models"] = {
                         "description": "GGA of Perdew, Burke and Ernzerhof 1997.",
                         "keywords": {"GGA": "PE"},
                     },
+                    "PBE-D3BJ : PBE with D3(BJ) dispersion": {
+                        "description": "GGA of Perdew, Burke and Ernzerhof 1997.",
+                        "keywords": {"GGA": "PE", "IVDW": "12"},
+                    },
                     "AM05 : Armiento and Mattsson": {
                         "description": (
                             "GGA functional designed to include surface effects in "
@@ -81,17 +85,33 @@ metadata["computational models"] = {
                         "description": "Modified PBE GGA according to Ref. [187].",
                         "keywords": {"GGA": "PS"},
                     },
+                    "PBEsol-D3BJ : PBEsol with D3(BJ) dispersion": {
+                        "description": "Modified PBE GGA according to Ref. [187].",
+                        "keywords": {"GGA": "PS", "IVDW": "12"},
+                    },
                     "RPBE : the revised PBE functional of Hammer et al.": {
                         "description": (
                             "The RPBE modified PBE functional according to Ref. [93]."
                         ),
                         "keywords": {"GGA": "RP"},
                     },
+                    "RPBE-D3BJ : RPBE with D3(BJ) dispersion": {
+                        "description": (
+                            "The RPBE modified PBE functional according to Ref. [93]."
+                        ),
+                        "keywords": {"GGA": "RP", "IVDW": "12"},
+                    },
                     "revPBE : the revised PBE functional of Zhang and Yang": {
                         "description": (
                             "The revPBE modified PBE GGA suggested in Ref. [247]."
                         ),
-                        "keywords": {"GGA": "RE"},
+                        "keywords": {"GGA": "RE", "IVDW": "12"},
+                    },
+                    "revPBE-D3BJ : revPBE with D3(BJ) dispersion": {
+                        "description": (
+                            "The revPBE modified PBE GGA suggested in Ref. [247]."
+                        ),
+                        "keywords": {"GGA": "RE", "IVDW": "12"},
                     },
                     "PW91 : Perdew-Wang 1991 GGA": {
                         "description": (
@@ -116,6 +136,13 @@ metadata["computational models"] = {
                         ),
                         "keywords": {"METAGGA": "M06L"},
                     },
+                    "M06-l-D3BJ : M06-l with D3(BJ) dispersion": {
+                        "description": (
+                            "Truhlar’s optimized meta-GGA of the 'M06' suite of "
+                            "functionals. [250]"
+                        ),
+                        "keywords": {"METAGGA": "M06L", "IVDW": "12"},
+                    },
                     "revTPSS": {
                         "description": (
                             "Meta-GGA revTPSS functional of Ref. [185, 186]",
@@ -125,6 +152,10 @@ metadata["computational models"] = {
                     "TPSS": {
                         "description": "Meta-GGA TPSS functional of Ref. [223]",
                         "keywords": {"METAGGA": "TPSS"},
+                    },
+                    "TPSS-D3BJ": {
+                        "description": "TPSS with D3(BJ) dispersion",
+                        "keywords": {"METAGGA": "TPSS", "IVDW": "12"},
                     },
                     "SCAN:": {
                         "description": (
@@ -136,6 +167,10 @@ metadata["computational models"] = {
                             " results."
                         ),
                         "keywords": {"METAGGA": "SCAN"},
+                    },
+                    "SCAN-D3BJ:": {
+                        "description": "SCAN with D3(BJ) dispersion",
+                        "keywords": {"METAGGA": "SCAN", "IVDW": "12"},
                     },
                     "rSCAN:": {
                         "description": (
@@ -150,6 +185,35 @@ metadata["computational models"] = {
                             "  numerically more stable."
                         ),
                         "keywords": {"METAGGA": "RSCAN"},
+                    },
+                    "r2SCAN-D3BJ: r2SCAN with D3(BJ) dispersion": {
+                        "description": (
+                            "r2SCAN is a regularized version of SCAN that is"
+                            " numerically more stable, with D3(BJ) long-range"
+                            " dispersion correction parameters from ORCA."
+                        ),
+                        "keywords": {
+                            "METAGGA": "RSCAN",
+                            "IVDW": "12",
+                            "VDW_S8": "0.7898",
+                            "VDW_A1": "0.4948",
+                            "VDW_A2": "5.7308",
+                        },
+                    },
+                    "r2SCAN-D4BJ: r2SCAN plus D4(BJ) dispersion corrections": {
+                        "description": (
+                            "r2SCAN is a regularized version of SCAN that is"
+                            "  numerically more stable, with D4(BJ) long-range"
+                            " dispersion correction parameters from ORCA."
+                        ),
+                        "keywords": {
+                            "METAGGA": "RSCAN",
+                            "IVDW": "13",
+                            "VDW_S6": "1.0000",
+                            "VDW_S8": "0.60187490",
+                            "VDW_A1": "0.51559235",
+                            "VDW_A2": "5.77342911",
+                        },
                     },
                 },
             },
@@ -515,6 +579,40 @@ metadata["keywords"] = {
             "Damping or quenching factor in damped MD; ensemble in normal MD (-3=NVE,"
             " -1=T annealing, >=0 Nosé mass)"
         ),
+    },
+    "IVDW": {
+        "description": (
+            "Specifies a vdW dispersion term of the atom-pairwise or many-body type."
+        ),
+        "default": 12,
+    },
+    "VDW_S6": {
+        "description": (
+            "VDW_S6 sets the global scaling factor S6 for the DFT-D2, DFT-D4, DFT-ulg, "
+            "and Tkatchenko-Scheffler methods."
+        ),
+        "default": "",
+    },
+    "VDW_S8": {
+        "description": (
+            "VDW_S8 sets the damping function parameter S8 in the DFT-D3 and "
+            "DFT-D4 methods."
+        ),
+        "default": 1.0000,
+    },
+    "VDW_A1": {
+        "description": (
+            "VDW_A1 sets the damping function parameter a1 for the DFT-D3 (BJ damping "
+            "function) and DFT-D4 methods."
+        ),
+        "default": "",
+    },
+    "VDW_A2": {
+        "description": (
+            "VDW_A2 defines the damping function parameter a2 for the DFT-D3 (BJ "
+            "damping function) and DFT-D4 methods."
+        ),
+        "default": "",
     },
 }
 

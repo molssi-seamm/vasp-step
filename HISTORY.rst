@@ -1,6 +1,13 @@
 =======
 History
 =======
+2026.2.1: Added -D3BJ functionals and reference energies for r2SCAN-D3BJ
+    * Added the natively supported functionals with D3(BJ) dispersion corrections,
+      PBE-D3BJ, PBEsol-D3BJ, RPBE-D3BJ, revPBE-D3BJ, M06-l-D3BJ, TPSS-D3BJ, and
+      SCAN-D3BJ. Also added r2SCAN-D3BJ using the D3 parameters from ORCA.
+    * Added reference energies for r2SCAN-D3BJ with a 700 ev cutoff for elements He-Ca
+      except P and S.
+
 2026.1.28: Bugfix: protected against missing data calculating energies of formation
     * Fixed issues with missing data when trying to calculate the energies of formation,
       etc. Now the code notes the error and continues safely.
