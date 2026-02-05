@@ -129,15 +129,13 @@ class OptimizationParameters(EnergyParameters):  # noqa: E999
             "help_text": "The maximum number of optimization steps (NSW).",
         },
         "convergence cutoff": {
-            "default": 1.0e-02,
+            "default": 0.01,
             "kind": "float",
             "default_units": "eV/Å",
             "enumeration": None,
             "format_string": "",
             "description": "Gradient convergence:",
-            "help_text": (
-                "The convergence in terms of RMS of the gradient (sqrt(EDIFFG)."
-            ),
+            "help_text": ("The convergence of the maximum gradient on an atom (eV/Å)."),
         },
         "step scale factor": {
             "default": 0.5,

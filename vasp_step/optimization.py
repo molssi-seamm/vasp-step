@@ -136,8 +136,8 @@ class Optimization(vasp_step.Energy):
 
         method = P["optimization method"]
         text = "The structure will be optimized using the {optimization method}"
-        text += " until the RMS force is below about {convergence cutoff} with a"
-        text += " limit of {number of steps} steps."
+        text += " until the maximim force on an atom is below about"
+        text += "  {convergence cutoff} with a limit of {number of steps} steps."
         tmp = P["optimize atom positions"]
         atoms = tmp == "yes" if isinstance(tmp, str) else tmp
         tmp = P["optimize cell shape"]
@@ -238,7 +238,7 @@ class Optimization(vasp_step.Energy):
         keywords["ISIF"] = 3 if P["calculate stress"] else 0
         keywords["NSW"] = P["number of steps"]
         ediffg = P["convergence cutoff"].m_as("eV/Å")
-        keywords["EDIFFG"] = f"-{ediffg**2:.1E}"
+        keywords["EDIFFG"] = f"-{ediffg:.3f}"
 
         method = P["optimization method"]
         if "DIIS" in method:
@@ -301,6 +301,7 @@ class Optimization(vasp_step.Energy):
         self,
         P=None,
         configuration=None,
+        starting_configuration=None,
         indent="",
         text="",
         table=None,
@@ -344,14 +345,37 @@ class Optimization(vasp_step.Energy):
         table["Units"].append("")
 
         # Update the configuration with the final cell and fractionals
-        configuration.cell.parameters = results["cell,iter"][-1]
-        # Reorder the atoms back to SEAMM order
-        tmp = results["fractionals,iter"][-1]
-        configuration.atoms.coordinates = [tmp[i] for i in self.to_VASP_order]
+        if configuration is not None:
+            configuration.cell.parameters = results["cell,iter"][-1]
+            # Reorder the atoms back to SEAMM order
+            tmp = results["fractionals,iter"][-1]
+            configuration.atoms.coordinates = [tmp[i] for i in self.to_VASP_order]
+
+        # Get the change of cell, density & volume for properties
+        a0, b0, c0, alpha0, beta0, gamma0 = results["cell,iter"][0]
+        V0 = results["V,iter"][0]
+        a, b, c, alpha, beta, gamma = results["cell,iter"][-1]
+        V = results["V,iter"][-1]
+
+        results["delta a"] = a - a0
+        results["delta b"] = b - b0
+        results["delta c"] = c - c0
+        results["delta alpha"] = alpha - alpha0
+        results["delta beta"] = beta - beta0
+        results["delta gamma"] = gamma - gamma0
+        mass = starting_configuration.mass
+        rho0 = (mass / V0) * (1.0e24 / 6.02214076e23)
+        rho = (mass / V) * (1.0e24 / 6.02214076e23)
+        results["V"] = V
+        results["density"] = rho
+        results["delta V"] = V - V0
+        results["delta density"] = rho - rho0
+        results["delta density %"] = (rho - rho0) / rho0 * 100
 
         super().analyze(
             P=P,
             configuration=configuration,
+            starting_configuration=starting_configuration,
             indent=indent,
             text=text,
             table=table,
@@ -365,7 +389,7 @@ class Optimization(vasp_step.Energy):
         a, b, c, alpha, beta, gamma = results["cell,iter"][-1]
         V = results["V,iter"][-1]
         ctable = {
-            "": ("𝗮", "𝗯", "𝗰", "𝞪", "𝞫", "𝞬", "V"),
+            "": ("𝗮", "𝗯", "𝗰", "𝞪", "𝞫", "𝞬", "V", "ρ", "%"),
             "Initial": (
                 f"{a0:.3f}",
                 f"{b0:.3f}",
@@ -374,6 +398,8 @@ class Optimization(vasp_step.Energy):
                 f"{beta0:.1f}",
                 f"{gamma0:.1f}",
                 f"{V0:.1f}",
+                f"{rho0:.3f}",
+                "",
             ),
             "Final": (
                 f"{a:.3f}",
@@ -383,6 +409,8 @@ class Optimization(vasp_step.Energy):
                 f"{beta:.1f}",
                 f"{gamma:.1f}",
                 f"{V:.1f}",
+                f"{rho:.3f}",
+                "",
             ),
             "Change": (
                 f"{a - a0:.3f}",
@@ -392,8 +420,10 @@ class Optimization(vasp_step.Energy):
                 f"{beta - beta0:.1f}",
                 f"{gamma - gamma0:.1f}",
                 f"{V - V0:.1f}",
+                f"{rho - rho0:.3f}",
+                f"{(rho - rho0) / rho0 * 100:.2f}%",
             ),
-            "Units": ("Å", "Å", "Å", "°", "°", "°", "Å\N{SUPERSCRIPT THREE}"),
+            "Units": ("Å", "Å", "Å", "°", "°", "°", "Å\N{SUPERSCRIPT THREE}", "g/mL"),
         }
 
         tmp = tabulate(

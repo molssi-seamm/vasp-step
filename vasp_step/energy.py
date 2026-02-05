@@ -640,7 +640,11 @@ class Energy(seamm.Node):
             )
 
             # And analyze the results
-            self.analyze(P=P, configuration=configuration)
+            self.analyze(
+                P=P,
+                configuration=configuration,
+                starting_configuration=starting_configuration,
+            )
 
             # Did it! Write the success file, so don't rerun VASP again
             success_file.write_text("success")
@@ -655,6 +659,7 @@ class Energy(seamm.Node):
         self,
         P=None,
         configuration=None,
+        starting_configuration=None,
         indent="",
         text="",
         table=None,
@@ -715,6 +720,16 @@ class Energy(seamm.Node):
             path = self.wd / "Thermochemistry.txt"
             path.write_text(tmp_text)
 
+        # Energy per atom
+        if "energy" in results and starting_configuration is not None:
+            n_atoms = starting_configuration.n_atoms
+            results["energy/atom"] = float(results["energy"]) / n_atoms
+
+        # Adding timing info
+        if self._timing_data is not None:
+            results["SEAMM elapsed time"] = self._timing_data[13]
+            results["SEAMM np"] = self._timing_data[12]
+
         if table is None:
             table = {
                 "Property": [],
@@ -726,6 +741,7 @@ class Energy(seamm.Node):
         for key, title in (
             ("DfE0", f"{lDelta}fE{degree_sign}"),
             ("energy", "E"),
+            ("energy/atom", "E/atom"),
             ("Gelec", "Gelec"),
             ("Ecoh", "Ecoh"),
             ("Ecoh/atom", "Ecoh/atom"),
@@ -828,7 +844,7 @@ class Energy(seamm.Node):
         # Check if have the data
         atom_formation_energy = None
         atom_energy = None
-        column = self.model + "@" + str(encut)
+        column = self.model.split(" : ")[0] + "@" + str(encut)
 
         self.logger.debug(f"Looking for '{column}'")
 
@@ -1312,8 +1328,41 @@ class Energy(seamm.Node):
             encut = encut.m_as("eV")
         keywords["ENCUT"] = f"{encut:.2f}"
 
+        # Initial wavefunction
+        initial_wavefunction = P["initial wavefunction"]
+        if initial_wavefunction == "default":
+            step_no = int(self._id[-1])
+            if step_no == 1:
+                initial_wavefunction = None
+            else:
+                initial_wavefunction = self.file_path(
+                    f"{step_no - 1}/WAVECAR", relative_to=self.wd.parent
+                )
+                if not initial_wavefunction.exists():
+                    initial_wavefunction = None
+        elif initial_wavefunction == "random guess":
+            keywords["ISTART"] = 0
+        else:
+            initial_wavefunction = self.file_path(
+                initial_wavefunction, relative_to=self.wd.parent
+            )
+            if not initial_wavefunction.exists():
+                tmp = P["initial checkpoint"]
+                raise ValueError(
+                    f"The requested initial checkpoint file '{tmp}' "
+                    f"({initial_wavefunction}) does not exist, so stopping."
+                )
+        if initial_wavefunction is None:
+            keywords["ISTART"] = 0
+        else:
+            # Must copy the WAVECAR into the run directory
+            self.wd.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(initial_wavefunction, self.wd)
+            keywords["ISTART"] = 1
+
         # Electronic optimization algorithm
         keywords["ALGO"] = P["electronic method"].title().replace(" ", "")
+        keywords["ISEARCH"] = 1
         keywords["NELM"] = P["nelm"]
         keywords["NELMIN"] = 2 if P["nelmin"] == "default" else P["nelmin"]
         keywords["EDIFF"] = f'{P["ediff"]:.2E}'
@@ -1384,11 +1433,11 @@ class Energy(seamm.Node):
             keywords["LSCALU"] = ".True." if P["lscalu"] else ".False."
 
         # Replace and add any extra keywords the user has specified
-        # The values look like 'key=value'
+        # The values look like 'key=value'. Dereference any variables.
         keyword_data = self.metadata["keywords"]
         for tmp in P["extra keywords"]:
             key, value = tmp.split("=", 1)
-            keywords[key] = value
+            keywords[key] = self.parent.get_value(value)
             if key in keyword_data:
                 descriptions[key] = keyword_data[key]["description"]
 

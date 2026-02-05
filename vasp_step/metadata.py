@@ -157,7 +157,7 @@ metadata["computational models"] = {
                         "description": "TPSS with D3(BJ) dispersion",
                         "keywords": {"METAGGA": "TPSS", "IVDW": "12"},
                     },
-                    "SCAN:": {
+                    "SCAN": {
                         "description": (
                             "'Strongly Constrained and Appropriately Normed Semilocal "
                             "Density Functional,' i.e., the SCAN meta-GGA functional "
@@ -168,46 +168,46 @@ metadata["computational models"] = {
                         ),
                         "keywords": {"METAGGA": "SCAN"},
                     },
-                    "SCAN-D3BJ:": {
+                    "SCAN-D3BJ": {
                         "description": "SCAN with D3(BJ) dispersion",
                         "keywords": {"METAGGA": "SCAN", "IVDW": "12"},
                     },
-                    "rSCAN:": {
+                    "rSCAN": {
                         "description": (
                             "rSCAN is a regularized version of SCAN that is numerically"
                             " more stable."
                         ),
                         "keywords": {"METAGGA": "RSCAN"},
                     },
-                    "r2SCAN:": {
+                    "r2SCAN": {
                         "description": (
                             "r2SCAN is a regularized version of SCAN that is"
                             "  numerically more stable."
                         ),
-                        "keywords": {"METAGGA": "RSCAN"},
+                        "keywords": {"METAGGA": "R2SCAN"},
                     },
-                    "r2SCAN-D3BJ: r2SCAN with D3(BJ) dispersion": {
+                    "r2SCAN-D3BJ : r2SCAN with D3(BJ) dispersion": {
                         "description": (
                             "r2SCAN is a regularized version of SCAN that is"
                             " numerically more stable, with D3(BJ) long-range"
                             " dispersion correction parameters from ORCA."
                         ),
                         "keywords": {
-                            "METAGGA": "RSCAN",
+                            "METAGGA": "R2SCAN",
                             "IVDW": "12",
                             "VDW_S8": "0.7898",
                             "VDW_A1": "0.4948",
                             "VDW_A2": "5.7308",
                         },
                     },
-                    "r2SCAN-D4BJ: r2SCAN plus D4(BJ) dispersion corrections": {
+                    "r2SCAN-D4BJ : r2SCAN plus D4(BJ) dispersion corrections": {
                         "description": (
                             "r2SCAN is a regularized version of SCAN that is"
                             "  numerically more stable, with D4(BJ) long-range"
                             " dispersion correction parameters from ORCA."
                         ),
                         "keywords": {
-                            "METAGGA": "RSCAN",
+                            "METAGGA": "R2SCAN",
                             "IVDW": "13",
                             "VDW_S6": "1.0000",
                             "VDW_S8": "0.60187490",
@@ -419,6 +419,17 @@ For example::
     }
 """
 metadata["keywords"] = {
+    "ISEARCH": {
+        "description": "0: use legacy linesearch; 1 for new.",
+        "default": 1,
+    },
+    "ISTART": {
+        "description": (
+            "Whether to read WAVECAR: 0: from scratch; 1: constant E basis; 2: constant"
+            " basis."
+        ),
+        "default": 0,
+    },
     "LH5": {
         "description": "Use HDF5 files instead of text files",
         "default": ".True.",
@@ -457,6 +468,13 @@ metadata["keywords"] = {
             " 4-8 recommended for minimization and MD"
         ),
         "default": "2",
+    },
+    "NELMDL": {
+        "description": (
+            "The number of non-consistent electronic steps at beginning. "
+            "negative for first ionic step, positive for all steps."
+        ),
+        "default": -5,
     },
     "EDIFF": {
         "description": "Convergence criterion for electronic self-consistency",
@@ -717,6 +735,13 @@ metadata["results"] = {
         "units": "eV",
         "format": ".3f",
     },
+    "energy/atom": {
+        "description": "total energy per atom",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "eV",
+        "format": ".3f",
+    },
     "Gelec": {
         "description": "The electronic free energy of the system",
         "dimensionality": "scalar",
@@ -748,6 +773,35 @@ metadata["results"] = {
         "type": "float",
         "units": "Å^3",
         "format": ".1f",
+    },
+    "delta V": {
+        "description": "change in volume",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "Å^3",
+        "format": ".1f",
+    },
+    "density": {
+        "description": "density",
+        "dimensionality": "scalar",
+        "property": "density#VASP#{model}",
+        "type": "float",
+        "units": "g/mL",
+        "format": ".4f",
+    },
+    "delta density": {
+        "description": "change in density",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "g/mL",
+        "format": ".4f",
+    },
+    "delta density %": {
+        "description": "% change in density",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "",
+        "format": ".2f",
     },
     "stress": {
         "description": "stress",
@@ -805,6 +859,42 @@ metadata["results"] = {
         "units": "degree",
         "format": ".1f",
     },
+    "delta a": {
+        "description": "change in 'a'",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "Å",
+    },
+    "delta b": {
+        "description": "change in 'b'",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "Å",
+    },
+    "delta c": {
+        "description": "change in 'c'",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "Å",
+    },
+    "delta alpha": {
+        "description": "change in 'alpha'",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "degree",
+    },
+    "delta beta": {
+        "description": "change in 'beta'",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "degree",
+    },
+    "delta gamma": {
+        "description": "change in 'gamma'",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "degree",
+    },
     "RMS atom force": {
         "description": "the RMS force on the atoms",
         "dimensionality": "scalar",
@@ -858,5 +948,18 @@ metadata["results"] = {
         "type": "string",
         "units": "",
         "format": "",
+    },
+    "SEAMM elapsed time": {
+        "description": "total elapsed time for VASP",
+        "dimensionality": "scalar",
+        "type": "float",
+        "units": "s",
+        "format": ".1f",
+    },
+    "SEAMM np": {
+        "description": "number of processors for VASP",
+        "dimensionality": "scalar",
+        "type": "integer",
+        "format": "d",
     },
 }
