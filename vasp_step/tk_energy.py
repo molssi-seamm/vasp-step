@@ -1085,7 +1085,14 @@ class TkEnergy(seamm.TkNode):
         # Then create the widgets and place them
         row = 0
         widgets = []
-        for key in ("electronic method", "nelm", "nelmin", "ediff", "precision"):
+        for key in (
+            "electronic method",
+            "nelm",
+            "nelmin",
+            "ediff",
+            "precision",
+            "initial wavefunction",
+        ):
             w = self[key] = P[key].widget(scf_frame)
             w.grid(row=row, column=0, sticky="ew")
             row += 1
@@ -1139,6 +1146,23 @@ class TkEnergy(seamm.TkNode):
             "nsim",
         ):
             self[key] = P[key].widget(performance_frame)
+
+        s_frame = self["structure frame"] = ttk.LabelFrame(
+            main_frame,
+            borderwidth=4,
+            relief="sunken",
+            text="Configuration Handling",
+            labelanchor="n",
+            padding=10,
+        )
+        row = 0
+        widgets = []
+        for key in ("structure handling", "system name", "configuration name"):
+            self[key] = P[key].widget(s_frame)
+            self[key].grid(row=row, column=0, sticky=tk.EW)
+            widgets.append(self[key])
+            row += 1
+        sw.align_labels(widgets, sticky=tk.E)
 
         # Top level needs to call reset_dialog to layout the dialog
         if self.node.calculation == "energy":
@@ -1438,8 +1462,13 @@ class TkEnergy(seamm.TkNode):
             row += 1
         sw.align_labels(widgets, sticky=tk.E)
 
-        # The calculation
-        self["calculation frame"].grid(row=row, column=0, columnspan=4, pady=5)
+        # The calculation and handling of the structure
+        self["calculation frame"].grid(
+            row=row, column=0, columnspan=2, pady=5, sticky="new"
+        )
+        self["structure frame"].grid(
+            row=row, column=2, columnspan=2, pady=5, sticky="new"
+        )
         row += 1
 
         # The model for the calculation

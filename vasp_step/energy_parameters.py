@@ -162,6 +162,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
                 "normal",
                 "fast",
                 "very fast",
+                "all",
                 "conjugate",
                 "damped",
                 "exact",
@@ -178,6 +179,15 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "format_string": "",
             "description": "Precision of FFT grids and projections:",
             "help_text": "The precision of the FFT grids the real-space projections.",
+        },
+        "initial wavefunction": {
+            "default": "default",
+            "kind": "string",
+            "default_units": "",
+            "enumeration": ("default", "random guess"),
+            "format_string": "s",
+            "description": "Initial wavefunction:",
+            "help_text": "The initial wavefunction to start with.",
         },
         # Performance
         "np": {
@@ -457,7 +467,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             "help_text": "How to center the grid in reciprocal space.",
         },
         "occupation type": {
-            "default": "Methfessel-Paxton method",
+            "default": "Gaussian smearing",
             "kind": "enumeration",
             "default_units": "",
             "enumeration": (
@@ -491,7 +501,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
             ),
         },
         "smearing width": {
-            "default": 0.01,
+            "default": 0.05,
             "kind": "float",
             "default_units": "eV",
             "enumeration": None,
@@ -559,6 +569,7 @@ class EnergyParameters(seamm.Parameters):  # noqa: E999
                 **EnergyParameters.parameters,
                 **EnergyParameters.model_parameters,
                 **EnergyParameters.kspace_parameters,
+                **seamm.standard_parameters.structure_handling_parameters,
                 **defaults,
             },
             data=data,

@@ -1,6 +1,22 @@
 =======
 History
 =======
+2026.2.5: Corrected r2SCAN and added functionality
+    * Corrected an error with r2SCAN which resulted in running rSCAN instead!
+    * Added atomic and elemental reference energies for PBE, PBE-D3BJ, r2SCAN, and
+      r2SCAN-D3BJ with a 700 eV cutoff. Have all atoms through Pu and elements through
+      Ar except for S which is still running.
+    * Added changes in the cell parameters, density and volume to the available results,
+      as well as the elapsed time for the VASP calculation and the number of processors
+      used and the energy per atom.
+    * Add the standard system and configuration handling to create new configurations
+      and systems to store the results of calculations.
+    * Added the ability to start from a previous WAVECAR file, be default that from the
+      previous step of the VASP calculation.
+    * Switched the default to using the new line search (ISEARCH=1) in optimizations.
+    * Corrected the geometry convergence parameter to be the maximum force on an atom or
+      cell coordinate, not the square.
+
 2026.2.1: Added -D3BJ functionals and reference energies for r2SCAN-D3BJ
     * Added the natively supported functionals with D3(BJ) dispersion corrections,
       PBE-D3BJ, PBEsol-D3BJ, RPBE-D3BJ, revPBE-D3BJ, M06-l-D3BJ, TPSS-D3BJ, and
