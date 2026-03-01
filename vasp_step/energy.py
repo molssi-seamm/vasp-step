@@ -10,7 +10,6 @@ import importlib
 import logging
 from math import isnan, ceil as ceiling
 from pathlib import Path
-import pkg_resources
 import platform
 import pprint  # noqa: F401
 import shutil
@@ -46,7 +45,7 @@ job = printing.getPrinter()
 printer = printing.getPrinter("VASP")
 
 # Add this module's properties to the standard properties
-path = Path(pkg_resources.resource_filename(__name__, "data/"))
+path = importlib.resources.files("vasp_step") / "data"
 csv_file = path / "properties.csv"
 if path.exists():
     molsystem.add_properties_from_file(csv_file)
@@ -835,7 +834,7 @@ class Energy(seamm.Node):
         else:
             personal_table = None
 
-        path = Path(pkg_resources.resource_filename(__name__, "data/"))
+        path = importlib.resources.files("vasp_step") / "data"
         csv_file = path / "element_energies.csv"
         table = pandas.read_csv(csv_file, index_col=False)
 

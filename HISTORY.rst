@@ -1,6 +1,8 @@
 =======
 History
 =======
+2026.3.1: Internal: switching from deprecated library pkg_resources to importlib
+
 2026.2.5: Corrected r2SCAN and added functionality
     * Corrected an error with r2SCAN which resulted in running rSCAN instead!
     * Added atomic and elemental reference energies for PBE, PBE-D3BJ, r2SCAN, and
