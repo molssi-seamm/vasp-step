@@ -1,6 +1,13 @@
 =======
 History
 =======
+2026.7.28: Initial wavefunction can reference another job
+
+    * **Initial wavefunction** can now reference another job's WAVECAR, via
+      ``job://<job number>/<name>`` (SEAMM's ``Node.file_path`` gained
+      read-only cross-job references) -- useful for seeding from a
+      wavefunction computed in a different job.
+
 2026.3.1: Internal: switching from deprecated library pkg_resources to importlib
 
 2026.2.5: Corrected r2SCAN and added functionality

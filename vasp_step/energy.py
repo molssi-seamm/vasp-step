@@ -1343,7 +1343,7 @@ class Energy(seamm.Node):
             keywords["ISTART"] = 0
         else:
             initial_wavefunction = self.file_path(
-                initial_wavefunction, relative_to=self.wd.parent
+                initial_wavefunction, relative_to=self.wd.parent, read_only=True
             )
             if not initial_wavefunction.exists():
                 tmp = P["initial checkpoint"]
