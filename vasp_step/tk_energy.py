@@ -3,13 +3,13 @@
 """The graphical part of a Energy step"""
 
 import json
-from pathlib import Path
 import pprint  # noqa: F401
 import tkinter as tk
 import tkinter.ttk as ttk
 
 import vasp_step  # noqa: F401, E999
 import seamm
+from seamm_util import installation_path
 from seamm_util import ureg, Q_, units_class, CompactJSONEncoder  # noqa: F401, E999
 import seamm_widgets as sw
 
@@ -972,7 +972,7 @@ class TkEnergy(seamm.TkNode):
         )
 
         # Make sure we have the information about the PAW potentials
-        directory = Path("~/SEAMM/Parameters/VASP").expanduser()
+        directory = installation_path("Parameters", "VASP")
         index = directory / "index.json"
         if index.exists():
             with index.open() as fd:

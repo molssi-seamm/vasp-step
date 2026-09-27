@@ -1,6 +1,13 @@
 =======
 History
 =======
+2026.9.27 -- The VASP potentials can belong to the installation
+    * The PAW potentials were always taken from ``~/SEAMM/Parameters/VASP``. They are now
+      taken from the ``Parameters/VASP`` directory of the SEAMM installation in use,
+      falling back to ``~/SEAMM/Parameters/VASP`` if that installation has none. A
+      second installation such as ``~/SEAMM_DEV`` therefore works without copying the
+      potentials, but can have its own. Requires seamm-util 2026.9.27.1.
+
 2026.7.28: Initial wavefunction can reference another job
 
     * **Initial wavefunction** can now reference another job's WAVECAR, via
