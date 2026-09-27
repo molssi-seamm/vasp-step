@@ -5,7 +5,6 @@
 import importlib
 import json
 import logging
-from pathlib import Path
 import pprint  # noqa: F401
 import sys
 import time
@@ -14,6 +13,7 @@ import vasp_step
 import molsystem
 import seamm
 from seamm_util import ureg, Q_, getParser, CompactJSONEncoder  # noqa: F401
+from seamm_util import installation_path
 import seamm_util.printing as printing
 from seamm_util.printing import FormattedText as __
 
@@ -122,7 +122,7 @@ class VASP(seamm.Node):
         """The metadata data for the potentials."""
         # Make sure we have the information about the PAW potentials
         if self._potential_metadata is None:
-            directory = Path("~/SEAMM/Parameters/VASP").expanduser()
+            directory = installation_path("Parameters", "VASP")
             index = directory / "index.json"
             if index.exists():
                 with index.open() as fd:
@@ -303,7 +303,7 @@ class VASP(seamm.Node):
     def catalog_potentials(self):
         """Create a catalog of the PAW potentials."""
         t0 = time.time_ns()
-        directory = Path("~/SEAMM/Parameters/VASP").expanduser()
+        directory = installation_path("Parameters", "VASP")
         print(f"Potentials directory is {directory}")
         paths = directory.glob("**/POTCAR")
         data = {}
