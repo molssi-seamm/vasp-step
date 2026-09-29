@@ -91,5 +91,8 @@ setup(
             'Optimization = vasp_step:OptimizationStep',
             'Energy = vasp_step:EnergyStep',
         ],
+        'console_scripts': [
+            'vasp-step-installer=vasp_step.__main__:run',
+        ],
     },
 )

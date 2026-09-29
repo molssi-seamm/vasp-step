@@ -439,6 +439,73 @@ class Energy(seamm.Node):
         else:
             return __(text, **P, indent=4 * " ").__str__()
 
+    def _vasp_config(self, executor_type, path):
+        """How to run VASP, from the executor's section of vasp.ini.
+
+        A missing vasp.ini is created from the template in data/vasp.ini. If it
+        gives no command line, VASP is looked for on the PATH and the commands
+        found are saved in the file.
+
+        Parameters
+        ----------
+        executor_type : str
+            The executor's name, e.g. "local": the section of vasp.ini to use.
+        path : pathlib.Path
+            The vasp.ini file, usually ~/SEAMM/vasp.ini.
+
+        Returns
+        -------
+        dict(str, str)
+            The options in that section.
+        """
+        full_config = configparser.ConfigParser()
+
+        # If the config file doesn't exist, start from the template
+        if not path.exists():
+            resources = importlib.resources.files("vasp_step") / "data"
+            ini_text = (resources / "vasp.ini").read_text()
+            txt_config = Configuration(path)
+            txt_config.from_string(ini_text)
+            txt_config.save()
+
+        full_config.read(path)
+
+        # If the commands are not given, look for VASP in the path
+        if (
+            executor_type not in full_config
+            or full_config[executor_type].get("code", "").strip() == ""
+        ):
+            exe_path = shutil.which("vasp_std")
+            if exe_path is None:
+                raise RuntimeError(
+                    "SEAMM does not know how to run VASP. Give the command "
+                    f"lines in the [{executor_type}] section of {path} "
+                    "('code', 'gamma_code' and 'noncollinear_code'), or "
+                    "put vasp_std on your PATH."
+                )
+
+            txt_config = Configuration(path)
+
+            if not txt_config.section_exists(executor_type):
+                txt_config.add_section(executor_type)
+
+            if not full_config.has_option(executor_type, "installation"):
+                txt_config.set_value(executor_type, "installation", "local")
+            txt_config.set_value(executor_type, "code", "mpiexec -np {NTASKS} vasp_std")
+            for key, exe in (
+                ("gamma_code", "vasp_gam"),
+                ("noncollinear_code", "vasp_ncl"),
+            ):
+                if shutil.which(exe) is not None:
+                    txt_config.set_value(
+                        executor_type, key, f"mpiexec -np {{NTASKS}} {exe}"
+                    )
+            txt_config.save()
+            full_config = configparser.ConfigParser()
+            full_config.read(path)
+
+        return dict(full_config.items(executor_type))
+
     def run(self):
         """Run a Energy step.
 
@@ -523,61 +590,28 @@ class Energy(seamm.Node):
             else:
                 executor = self.parent.flowchart.executor
 
-                # Read configuration file for VASP if it exists
                 executor_type = executor.name
-                full_config = configparser.ConfigParser()
                 ini_dir = Path(seamm_options["root"]).expanduser()
                 path = ini_dir / "vasp.ini"
-
-                # If the config file doesn't exist, get the default
-                if not path.exists():
-                    resources = importlib.resources.files("vasp_step") / "data"
-                    ini_text = (resources / "vasp.ini").read_text()
-                    txt_config = Configuration(path)
-                    txt_config.from_string(ini_text)
-                    txt_config.save()
-
-                full_config.read(ini_dir / "vasp.ini")
-
-                # Getting desperate! Look for an executable in the path
-                if executor_type not in full_config:
-                    exe_path = shutil.which("vasp_std")
-                    if exe_path is None:
-                        raise RuntimeError(
-                            f"No section for '{executor_type}' in VASP ini file"
-                            f" ({ini_dir / 'vasp.ini'}), nor in the defaults, "
-                            "nor in the path!"
-                        )
-
-                    txt_config = Configuration(path)
-
-                    if not txt_config.section_exists(executor_type):
-                        txt_config.add_section(executor_type)
-
-                    txt_config.set_value(executor_type, "installation", "local")
-                    txt_config.set_value(
-                        executor_type, "code", "mpiexec -np {NTASKS} vasp_std"
-                    )
-                    txt_config.set_value(
-                        executor_type, "gamma_code", "mpiexec -np {NTASKS} vasp_gam"
-                    )
-                    txt_config.set_value(
-                        executor_type,
-                        "noncollinear_code",
-                        "mpiexec -np {NTASKS} vasp_ncl",
-                    )
-                    txt_config.save()
-                    full_config.read(ini_dir / "vasp.ini")
-
-                config = dict(full_config.items(executor_type))
+                config = self._vasp_config(executor_type, path)
                 # Use the matching version of the seamm-vasp image by default.
                 config["version"] = self.version
 
                 # Setup the calculation environment definition,
                 # seeing which excutable to use
                 if P["spin polarization"] == "noncollinear":
+                    if config.get("noncollinear_code", "").strip() == "":
+                        raise RuntimeError(
+                            "Non-collinear calculations need the non-collinear "
+                            "build of VASP (vasp_ncl). Give its command line as "
+                            f"'noncollinear_code' in the [{executor_type}] section "
+                            f"of {path}."
+                        )
                     cmd = config["noncollinear_code"]
-                elif self._gamma_point_only:
+                elif (
+                    self._gamma_point_only
+                    and config.get("gamma_code", "").strip() != ""
+                ):
                     cmd = config["gamma_code"]
                 else:
                     cmd = config["code"]
