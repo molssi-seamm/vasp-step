@@ -1,6 +1,20 @@
 =======
 History
 =======
+2026.9.29 -- Bugfix: a vasp.ini template to edit, and an installer that writes it
+    * The step expected to create ``~/SEAMM/vasp.ini`` from a template, but the template
+      was never included, so running VASP without the file failed. The template is now
+      included, with comments explaining each option for a local build or environment
+      modules.
+    * Added ``vasp-step-installer``, which the SEAMM Manager runs when the step is
+      installed, to write the template to ``~/SEAMM/vasp.ini`` for you to edit.
+    * If ``vasp.ini`` gives no command line, ``vasp_std`` (and ``vasp_gam`` and
+      ``vasp_ncl``) are looked for on the PATH; otherwise the error says what to set.
+      Gamma-point calculations use ``code`` when there is no Gamma-only build, and
+      non-collinear calculations without ``noncollinear_code`` say that it is needed.
+    * The documentation describes installing with the SEAMM Manager and configuring
+      ``vasp.ini``.
+
 2026.9.27 -- The VASP potentials can belong to the installation
     * The PAW potentials were always taken from ``~/SEAMM/Parameters/VASP``. They are now
       taken from the ``Parameters/VASP`` directory of the SEAMM installation in use,

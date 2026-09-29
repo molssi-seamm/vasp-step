@@ -1,0 +1,3 @@
+[vasp-step]
+# Options for the VASP step. Where VASP is and how to launch it are set separately,
+# in vasp.ini in the SEAMM root (usually ~/SEAMM/vasp.ini).
