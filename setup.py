@@ -83,6 +83,9 @@ setup(
         'org.molssi.seamm.tk': [
             'VASP = vasp_step:VASPStep',
         ],
+        'org.molssi.seamm.exec.resolvers': [
+            'vasp = vasp_step.resolver:resolve',
+        ],
         'org.molssi.seamm.vasp': [
             'Optimization = vasp_step:OptimizationStep',
             'Energy = vasp_step:EnergyStep',

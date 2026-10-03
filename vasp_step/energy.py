@@ -8,7 +8,7 @@ import csv
 from datetime import datetime, timezone
 import importlib
 import logging
-from math import isnan, ceil as ceiling
+from math import isnan
 from pathlib import Path
 import platform
 import pprint  # noqa: F401
@@ -25,6 +25,7 @@ import pandas
 from tabulate import tabulate
 
 import vasp_step  # noqa: E999
+from . import inputs
 import molsystem
 import seamm
 import seamm_exec
@@ -315,30 +316,12 @@ class Energy(seamm.Node):
         return self._element_count
 
     def atom_order(self):
-        """Get the coordinate information for VASP (POSCAR file)."""
+        """Work out the translation between SEAMM's and VASP's atom order."""
         system, configuration = self.get_system_configuration()
-
-        # Prepare to reorder the atoms into descending atomic number
-        atnos = configuration.atoms.atomic_numbers
-        unique_atnos = sorted(list(set(atnos)), reverse=True)
-
-        # The dictionary to translate to/from the VASP order
-        self._to_VASP_order = []
-        self._to_SEAMM_order = []
-        self._element_count = {atno: 0 for atno in atnos}
-        for atno in atnos:
-            self._element_count[atno] += 1
-        n = 0
-        offset = {}
-        for atno in unique_atnos:
-            offset[atno] = n
-            n += self._element_count[atno]
-        self._to_SEAMM_order = [-1] * len(atnos)
-        for original, atno in enumerate(atnos):
-            new = offset[atno]
-            self._to_VASP_order.append(new)
-            self._to_SEAMM_order[new] = original
-            offset[atno] += 1
+        to_vasp, to_seamm, count = inputs.atom_order(configuration.atoms.atomic_numbers)
+        self._to_VASP_order = to_vasp
+        self._to_SEAMM_order = to_seamm
+        self._element_count = count
 
     def description_text(self, P=None):
         """Create the text description of what this step will do.
@@ -1297,20 +1280,7 @@ class Energy(seamm.Node):
     def get_INCAR(self, P=None):
         """Get the control input (INCAR) for this calculation."""
         keywords, descriptions = self.get_keywords(P)
-
-        lines = []
-        keydata = self.metadata["keywords"]
-        for key, value in keywords.items():
-            if key in descriptions:
-                lines.append(f"{key:>20s} = {value:<20}  # {descriptions[key]}")
-            elif key in keydata and "description" in keydata[key]:
-                lines.append(
-                    f"{key:>20s} = {value:<20}  # {keydata[key]['description']}"
-                )
-            else:
-                lines.append(f"{key:>20s} = {value}")
-
-        return "\n".join(lines)
+        return inputs.incar_text(keywords, descriptions, self.metadata["keywords"])
 
     def get_keywords(self, P=None):
         """Get the keywords and values for the calculation."""
@@ -1320,47 +1290,34 @@ class Energy(seamm.Node):
                 context=seamm.flowchart_variables._data
             )
 
-        descriptions = {}
-        keywords = {}
-
         # The DFT functional
         model = P["model"]
         submodel = P["submodel"]
-
         model_data = self.metadata["computational models"][
             "Density Functional Theory (DFT)"
         ]["models"][model]["parameterizations"]
-
-        submodel_data = model_data[submodel]
         if self._timing_data is not None:
             self._timing_data[11] = f"{model} / {submodel}"
 
-        tmp = submodel_data["keywords"]
-        keywords.update(tmp)
-        descriptions[list(tmp)[0]] = submodel_data["description"]
+        # The energy cutoff, which may be an expression of ENMAX. Without the
+        # dialog ENMAX may not be set: then it comes from the potentials.
+        enmax = P["enmax"]
+        if hasattr(enmax, "m_as"):
+            enmax = enmax.m_as("eV")
+        if isinstance(P["plane-wave cutoff"], str) and not enmax:
+            _, configuration = self.get_system_configuration()
+            enmax = inputs.enmax(
+                configuration.atoms.atomic_numbers,
+                P["set of potentials"],
+                self.parent.potential_metadata[P["set of potentials"]],
+                P["potentials"],
+            )
+        context = None
+        if isinstance(P["plane-wave cutoff"], str):
+            context = seamm.flowchart_variables._data
+        encut = inputs.encut_value(P["plane-wave cutoff"], enmax, context)
 
-        # Spin polarization
-        if P["spin polarization"] == "collinear":
-            keywords["ISPIN"] = 2
-        elif P["spin polarization"] == "noncollinear":
-            keywords["LNONCOLLINEAR"] = ".True."
-        else:
-            keywords["ISPIN"] = 1
-
-        # Non-spherical contributions in PAWs
-        keywords["LASPH"] = ".True." if P["nonspherical PAW"] else ".False."
-
-        # The energy cutoff, which may be an expression of ENMAX
-        encut = P["plane-wave cutoff"]
-        if isinstance(encut, str):
-            global_dict = {**seamm.flowchart_variables._data}
-            global_dict["ENMAX"] = P["enmax"]
-            global_dict["enmax"] = P["enmax"]
-            encut = eval(encut, global_dict)
-        else:
-            encut = encut.m_as("eV")
-        keywords["ENCUT"] = f"{encut:.2f}"
-
+        keywords = {}
         # Initial wavefunction
         initial_wavefunction = P["initial wavefunction"]
         if initial_wavefunction == "default":
@@ -1393,211 +1350,67 @@ class Energy(seamm.Node):
             shutil.copy2(initial_wavefunction, self.wd)
             keywords["ISTART"] = 1
 
-        # Electronic optimization algorithm
-        keywords["ALGO"] = P["electronic method"].title().replace(" ", "")
-        keywords["ISEARCH"] = 1
-        keywords["NELM"] = P["nelm"]
-        keywords["NELMIN"] = 2 if P["nelmin"] == "default" else P["nelmin"]
-        keywords["EDIFF"] = f'{P["ediff"]:.2E}'
-        keywords["PREC"] = P["precision"]
-
-        # Smearing
-        _type = P["occupation type"].lower()
-        if "gaussian" in _type:
-            ismear = 0
-        elif "methfessel" in _type:
-            ismear = P["Methfessel-Paxton order"]
-        elif "tetrahedron" in _type:
-            if "corrections" in _type:
-                if "fermi" in _type:
-                    ismear = -15
-                else:
-                    ismear = -5
-            else:
-                if "fermi" in _type:
-                    ismear = -14
-                else:
-                    ismear = -4
-        elif "fermi" in _type:
-            ismear = -1
-        else:
-            raise ValueError(f"Occupation type (ISMEAR) '{_type} not recognized.")
-        keywords["ISMEAR"] = ismear
-        descriptions["ISMEAR"] = _type
-
-        if ismear >= -1 or ismear in (-15, -14):
-            sigma = P["smearing width"].m_as("eV")
-            keywords["SIGMA"] = f"{sigma:.2f}"
-
-        # The definition of the type of calculation: SPE
-        keywords["IBRION"] = -1
-        match P["calculate stress"]:
-            case "no":
-                isif = 0
-            case "only pressure":
-                isif = 1
-            case _:
-                isif = 2
-        keywords["ISIF"] = isif
-        keywords["NSW"] = 0
-        efermi = P["efermi"]
-        if "middle" in efermi:
-            keywords["EFERMI"] = "MIDGAP"
-        elif efermi == "legacy":
-            keywords["EFERMI"] = "Legacy"
-        else:
-            keywords["EFERMI"] = efermi.m_as("eV")
-
-        # Use the HDF5 output files
-        keywords["LH5"] = ".True." if P["use hdf5 files"] else ".False."
-
-        # Calculate on-site density and spin
-        if P["lorbit"]:
-            keywords["LORBIT"] = 11
-
-        # Parameters controlling the performance
-        keywords["NCORE"] = P["ncore"]
-        keywords["KPAR"] = P["kpar"]
-        keywords["LPLANE"] = ".True." if P["lplane"] else ".False."
-        keywords["LREAL"] = "Auto" if P["lreal"] else ".False."
-        keywords["NSIM"] = P["nsim"]
-        keywords["LSCALAPACK"] = ".True." if P["lscalapack"] else ".False."
-        if P["lscalapack"]:
-            keywords["LSCALU"] = ".True." if P["lscalu"] else ".False."
+        istart = keywords.get("ISTART", 0)
 
         # Replace and add any extra keywords the user has specified
         # The values look like 'key=value'. Dereference any variables.
-        keyword_data = self.metadata["keywords"]
+        extra = []
         for tmp in P["extra keywords"]:
             key, value = tmp.split("=", 1)
-            keywords[key] = self.parent.get_value(value)
-            if key in keyword_data:
-                descriptions[key] = keyword_data[key]["description"]
+            extra.append((key, self.parent.get_value(value)))
 
-        return keywords, descriptions
+        return inputs.keywords(
+            P,
+            functional=model_data[submodel],
+            istart=istart,
+            encut=encut,
+            extra=extra,
+            keyword_metadata=self.metadata["keywords"],
+        )
 
     def get_POTCAR(self, P=None):
         """Get the potential input (POTCAR) for this calculation.
 
-        The elements are ordered by descending atomic number.
+        The elements are ordered by descending atomic number. Elements without
+        a chosen potential get the set's default.
         """
         _, configuration = self.get_system_configuration()
-        atnos = sorted(list(set(configuration.atoms.atomic_numbers)), reverse=True)
-        elements = molsystem.elements.to_symbols(atnos)
-
-        # Which set of potentials are we using?
         potential_set = P["set of potentials"]
-        potential_data = self.parent.potential_metadata[potential_set]
-        potentials = P["potentials"]
-
-        text = ""
-        names = []
-        for element in elements:
-            name = potentials[element]
-            names.append(name)
-            path = Path(potential_data[name]["file"])
-            text += path.read_text()
-
+        text, names = inputs.potcar_text(
+            configuration.atoms.atomic_numbers,
+            potential_set,
+            self.parent.potential_metadata[potential_set],
+            P["potentials"],
+        )
         if self._timing_data is not None:
             self._timing_data[9] = " ".join(names)
-
         return text
 
     def get_KPOINTS(self, P=None):
         """Get the k-point grid, KPOINTS file."""
         _, configuration = self.get_system_configuration()
-
-        lines = []
-        if "point" in P["k-grid method"]:
-            lines.append("𝚪-point only")
-            na = nb = nc = 1
-        elif "explicit" in P["k-grid method"]:
-            lines.append("Explicit k-point mesh")
-            na = P["na"]
-            nb = P["nb"]
-            nc = P["nc"]
-        else:
+        lengths = None
+        if "point" not in P["k-grid method"] and "explicit" not in P["k-grid method"]:
             lengths = configuration.cell.reciprocal_lengths()
-            spacing = P["k-spacing"].to("1/Å").magnitude
-            lines.append(f"k-point mesh with spacing {spacing}")
-            na = max(1, ceiling(lengths[0] / spacing))
-            nb = max(1, ceiling(lengths[1] / spacing))
-            nc = max(1, ceiling(lengths[2] / spacing))
-            if P["odd grid"]:
-                na = na + 1 if na % 2 == 0 else na
-                nb = nb + 1 if nb % 2 == 0 else nb
-                nc = nc + 1 if nc % 2 == 0 else nc
-
-        self._gamma_point_only = na == 1 and nb == 1 and nc == 1
-
-        lines.append("0")
-        centering = P["centering"]
-        if "Monkhorst" in centering and "point" not in P["k-grid method"]:
-            lines.append("Monkhorst-Pack")
-        else:
-            lines.append("Gamma")
-        lines.append(f"{na} {nb} {nc}")
-        lines.append("0 0 0")
-
-        return "\n".join(lines)
+        text, self._gamma_point_only = inputs.kpoints_text(P, lengths)
+        return text
 
     def get_POSCAR(self, P=None):
         """Get the coordinate information for VASP (POSCAR file)."""
         system, configuration = self.get_system_configuration()
-
-        # And finally make the POSCAR file contents
-        lines = []
-        sysname = system.name
-        confname = configuration.name
-        if sysname == "" and confname == "":
-            formula, empirical, Z = configuration.formula
-            if Z == 1:
-                title = formula
-            else:
-                title = f"({empirical}) * {Z}"
-        else:
-            title = sysname + "/" + confname
-            if len(title) > 100:
-                if len(confname) <= 100:
-                    title = confname
-                else:
-                    formula, empirical, Z = configuration.formula
-                    if Z == 1:
-                        title = formula
-                    else:
-                        title = f"({empirical}) * {Z}"
-        lines.append(title)
-        lines.append("1.0")  # The scale factor. SEAMM always uses 1
-
-        # Cell vectors
-        vectors = configuration.cell.vectors()
-        for vector in vectors:
-            a, b, c = vector
-            lines.append(f"{a:12.6f} {b:12.6f} {c:12.6f}")
-
-        # Species and number of each
-        atnos = configuration.atoms.atomic_numbers
-        unique_atnos = sorted(list(set(atnos)), reverse=True)
-        unique_elements = molsystem.elements.to_symbols(unique_atnos)
-
-        tmp = [f"{el:>3s}" for el in unique_elements]
-        lines.append(" ".join(tmp))
-
-        tmp = [f"{self.element_count[atno]:3d}" for atno in unique_atnos]
-        lines.append(" ".join(tmp))
-
-        # Coordinates
-        lines.append("Direct")
+        title = inputs.poscar_title(
+            system.name, configuration.name, configuration.formula
+        )
         fractionals = configuration.atoms.get_coordinates(
             fractionals=True, in_cell=False
         )
-        n = len(self._to_SEAMM_order)
-        for i_vasp in range(n):
-            i_seamm = self.to_SEAMM_order[i_vasp]
-            xyz = [f"{x:12.6f}" for x in fractionals[i_seamm]]
-            lines.append(" ".join(xyz))
-
-        return "\n".join(lines)
+        self.atom_order()
+        return inputs.poscar_text(
+            title,
+            configuration.cell.vectors(),
+            configuration.atoms.atomic_numbers,
+            fractionals,
+        )
 
     def parse_xml(self, data_file):
         """Get the data from the vasprun.xml file."""

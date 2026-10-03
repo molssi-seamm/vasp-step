@@ -1,0 +1,1 @@
+Inputs of vasp_step's Energy substep captured before the input builder was factored out (vasp_step 2026.9.29 + dev 1690fe2). They must stay byte-identical. Regenerate only for an intended change of the inputs.

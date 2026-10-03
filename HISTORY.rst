@@ -1,6 +1,22 @@
 =======
 History
 =======
+2026.10.3 -- VASP as a model chemistry, for the MBE step
+    * VASP can be used as a model chemistry, ``VASP:DFT@<functional>/<potentials>@<ENCUT>``
+      (e.g. ``VASP:DFT@r2SCAN-D4/PAW-hard@1200``), so steps that evaluate many structures
+      -- first the MBE step's periodic low level -- run VASP as separate calculations,
+      locally or bundled on a cluster, and reuse finished ones on a rerun.
+    * A molecule can be placed in a box registered on a parent cell's FFT grid (whole grid
+      steps, the same atom-to-grid offsets as in the cell), so that many-body increments of
+      plane-wave calculations cancel the "egg-box" error; the cell's grid is set
+      explicitly.
+    * ``-D4`` functionals add the D4 dispersion with the dftd4 program after VASP (set
+      ``dftd4`` in vasp.ini), since many VASP builds lack D4: periodic for a cell, for the
+      isolated molecule for a fragment.
+    * ``PAW-hard`` uses the hard potentials (H, B, C, N, O, F, P, S, Cl); an ENCUT below
+      the potentials' ENMAX, and small cells without k-points, are refused.
+    * Without the graphical interface, elements without a chosen potential now get the
+      set's default instead of an error. The inputs of the VASP step itself are unchanged.
 2026.9.29 -- Bugfix: a vasp.ini template to edit, and an installer that writes it
     * The step expected to create ``~/SEAMM/vasp.ini`` from a template, but the template
       was never included, so running VASP without the file failed. The template is now
