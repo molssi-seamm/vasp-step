@@ -276,6 +276,15 @@ def get_task(
     functional = vasp_step.metadata["computational models"][
         "Density Functional Theory (DFT)"
     ]["models"][model]["parameterizations"][submodel]
+    if d4:
+        # dftd4 adds the dispersion: VASP must not add its own as well (plain
+        # revPBE's metadata carries IVDW = 12, for one)
+        functional = dict(functional)
+        functional["keywords"] = {
+            k: v
+            for k, v in functional["keywords"].items()
+            if k != "IVDW" and not k.startswith("VDW_")
+        }
     keywords, descriptions = inputs.keywords(
         P,
         functional=functional,

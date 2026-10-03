@@ -381,3 +381,25 @@ def test_resolver():
     ]
     with pytest.raises(RuntimeError, match="dftd4"):
         resolver.resolve({"gamma_code": "x", "dftd4": ""}, ["{dftd4}"], {}, {}, "/r")
+
+
+def test_d4_never_doubles_vasps_own_dispersion(catalog):
+    """revPBE's metadata carries IVDW = 12; revPBE-D4 must not keep it."""
+    import vasp_step
+
+    dft = vasp_step.metadata["computational models"]["Density Functional Theory (DFT)"]
+    revpbe = dft["models"]["Generalized-gradient approximations (GGA)"][
+        "parameterizations"
+    ]["revPBE : the revised PBE functional of Zhang and Yang"]
+    assert revpbe["keywords"].get("IVDW") == "12"  # the metadata as it is
+    mc = dict(MC, method="revPBE-D4", basis="PAW", cutoff="500")
+    task = batch.get_task(
+        geometry("m00"),
+        mc,
+        key="m",
+        options={"grid": {"reference_cell": CELL.tolist()}},
+    )
+    keys = incar(task)
+    assert keys["GGA"] == "RE"
+    assert "IVDW" not in keys and not any(k.startswith("VDW_") for k in keys)
+    assert "{dftd4}" in task.cmd and "revpbe" in task.cmd
