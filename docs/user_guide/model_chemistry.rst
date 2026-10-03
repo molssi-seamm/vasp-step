@@ -29,11 +29,20 @@ for example ``VASP:DFT@r2SCAN-D4/PAW-hard@1200``.
   - ``PAW-LDA`` is potpaw_LDA.64.
 
 - **ENCUT** is the plane-wave cutoff in eV. If it is missing, 1.3 × the largest
-  ENMAX of the potentials is used.
+  ENMAX of the potentials is used. A cutoff below the largest ENMAX is refused.
 
-The calculations are Gamma-point only, with the settings for accurate energies and
-forces: PREC = Accurate, EDIFF = 1e-7, ALGO = All, no symmetry, and no WAVECAR or
-CHGCAR. The stress is computed for a periodic structure when it is asked for.
+The functionals with VASP's own D4 (``-D4BJ``, IVDW = 13) are not offered: they
+need a VASP compiled with DFTD4, which many builds are not. Use ``-D4`` instead.
+
+The calculations use the settings for accurate energies and forces: PREC =
+Accurate, EDIFF = 1e-7, ALGO = All, no symmetry, and no WAVECAR or CHGCAR. The stress
+is computed for a periodic structure when it is asked for. The POTCAR (a licensed
+file) is deleted when the calculation finishes.
+
+**k-points.** A cell is sampled at the Gamma point alone, which suits the large
+cells of liquids and fragment boxes. A cell narrower than 10 Å is refused unless a
+k-point spacing is given (the ``k_spacing`` option, in 1/Å), which then sets a
+Gamma-centred mesh.
 
 Molecules in boxes, registered on a cell
 -----------------------------------------

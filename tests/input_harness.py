@@ -37,11 +37,11 @@ def write_fake_potcars():
         )
 
 
-def water_cell(db):
-    """Two waters in a 6 Å cubic cell."""
+def water_cell(db, a=6.0):
+    """Two waters in a cubic cell, 6 Å by default."""
     system = db.create_system(name="water")
     configuration = system.create_configuration(periodicity=3, name="two")
-    configuration.cell.parameters = [6.0, 6.0, 6.0, 90.0, 90.0, 90.0]
+    configuration.cell.parameters = [a, a, a, 90.0, 90.0, 90.0]
     xyz = np.array(
         [
             [1.0, 1.0, 1.0],

@@ -86,6 +86,9 @@ SETTINGS = {
     "use hdf5 files": "no",
 }
 
+#: Narrower cells need k-points: refused at the Gamma point alone (Å)
+GAMMA_ONLY_WIDTH = 10.0
+
 HARTREE_EV = Q_(1.0, "E_h").m_as("eV")
 EV_KJ = Q_(1.0, "eV").m_as("kJ/mol")
 BOHR = Q_(1.0, "bohr").m_as("Å")
@@ -111,10 +114,12 @@ def get_model_chemistry_options(periodic_only=False, mdi_only=False):
     if mdi_only:
         return {}
     options = {}
-    for name in functionals():
-        potentials = (
-            "PAW-LDA" if "LDA" in name or name in ("VWN5", "PW92", "PZ-LDA") else "PAW"
-        )
+    for name, (model, _, _) in functionals().items():
+        if name.endswith("-D4BJ"):
+            # VASP's own D4 (IVDW = 13) needs a build with DFTD4; the -D4 levels
+            # (dftd4 run in the task) work with any build.
+            continue
+        potentials = "PAW-LDA" if model.startswith("Local-density") else "PAW"
         options[name] = {
             "model_chemistry": f"VASP:DFT@{name}/{potentials}",
             "type": "DFT",
@@ -223,8 +228,20 @@ def get_task(
 
     ng = None
     dipole = False
+    k_spacing = options.get("k_spacing")
     if periodic:
         cell = np.asarray(data["cell"], dtype=float)
+        if k_spacing is None:
+            widths = abs(np.linalg.det(cell)) / np.linalg.norm(
+                np.cross(cell[[1, 2, 0]], cell[[2, 0, 1]]), axis=1
+            )
+            if widths.min() < GAMMA_ONLY_WIDTH:
+                raise ValueError(
+                    f"The cell is {widths.min():.2f} Å across at its narrowest: "
+                    "the Gamma point alone would not sample it. Give "
+                    "options['k_spacing'] (1/Å), or use a cell of at least "
+                    f"{GAMMA_ONLY_WIDTH:.0f} Å."
+                )
         if grid_options:
             placed = grid_.register_cell(xyz, cell, max_spacing)
             xyz, ng = placed["coordinates"], placed["ng"]
@@ -241,8 +258,14 @@ def get_task(
 
     catalog = potential_catalog()[potential_set]
     potcar, names = inputs.potcar_text(atnos, potential_set, catalog, variant=variant)
+    enmax = inputs.enmax(atnos, potential_set, catalog, variant=variant)
     if encut is None:
-        encut = 1.3 * inputs.enmax(atnos, potential_set, catalog, variant=variant)
+        encut = 1.3 * enmax
+    elif encut < enmax:
+        raise ValueError(
+            f"ENCUT {encut:.0f} eV is below the largest ENMAX of the potentials "
+            f"({enmax:.1f} eV, {' '.join(names)}): the basis would be incomplete."
+        )
 
     ntasks = 1 if resources is None or not resources.ntasks else int(resources.ntasks)
     # The same conversion of the values as the substep's (e.g. "no" -> False)
@@ -255,6 +278,10 @@ def get_task(
     values["ncore"] = 4 if ntasks % 4 == 0 else 1
     if multiplicity != 1:
         values["spin polarization"] = "collinear"
+    if k_spacing is not None and periodic:
+        values["k-grid method"] = "grid spacing"
+        values["k-spacing"] = float(k_spacing)
+        values["centering"] = "Gamma"
     for name, value in values.items():
         parameters[name].value = value
     P = parameters.current_values_to_dict(context={})
@@ -293,7 +320,10 @@ def get_task(
         extra=extra,
         keyword_metadata=vasp_step.metadata["keywords"],
     )
-    kpoints, _ = inputs.kpoints_text(P)
+    lengths = None
+    if P["k-grid method"] == "grid spacing":
+        lengths = 2 * np.pi * np.linalg.norm(np.linalg.inv(cell).T, axis=1)
+    kpoints, gamma_only = inputs.kpoints_text(P, lengths)
     files = {
         "INCAR": inputs.incar_text(
             keywords, descriptions, vasp_step.metadata["keywords"]
@@ -303,7 +333,7 @@ def get_task(
         "POSCAR": inputs.poscar_text(key, cell, atnos, xyz, cartesian=True, digits=10),
     }
 
-    cmd = ["{gamma_code}", ">", "vasp.out", "2>&1"]
+    cmd = ["{gamma_code}" if gamma_only else "{code}", ">", "vasp.out", "2>&1"]
     success = {"OUTCAR": "General timing"}
     return_files = [
         "INCAR",
@@ -341,6 +371,9 @@ def get_task(
         success["dftd4.json"] = "energy"
         return_files += ["dftd4.json", "dftd4.out", "fragment.xyz"]
 
+    # The licensed POTCAR is not left behind in the task's directory
+    cmd += ["&&", "rm", "-f", "POTCAR"]
+
     if resources is None:
         resources = seamm_exec.Resources(ntasks=ntasks, mem_per_cpu=2_000_000_000)
     return seamm_exec.Task(
@@ -351,9 +384,36 @@ def get_task(
         files=files,
         return_files=return_files,
         resources=resources,
-        estimated_seconds=estimated_seconds(len(atnos), ng, ntasks),
+        estimated_seconds=estimated_seconds(
+            len(atnos), ng or grid_.cell_grid(cell), ntasks
+        ),
         success_text=success,
+        fingerprint=fingerprint(cmd, files),
     )
+
+
+#: INCAR keywords that depend only on how many ranks run the task
+_PARALLEL = ("NCORE", "KPAR", "NPAR", "NSIM")
+
+
+def fingerprint(cmd, files):
+    """The task's restart identity: its command and files, without the INCAR's
+    parallelization keywords, so a rerun with another number of ranks reuses the
+    finished calculations."""
+    import hashlib
+
+    digest = hashlib.sha256()
+    digest.update("\0".join(cmd).encode())
+    for name in sorted(files):
+        text = files[name]
+        if name == "INCAR":
+            text = "\n".join(
+                line
+                for line in text.splitlines()
+                if line.split("=")[0].strip() not in _PARALLEL
+            )
+        digest.update(name.encode() + b"\0" + text.encode() + b"\0")
+    return digest.hexdigest()
 
 
 def parse_vasprun(text):

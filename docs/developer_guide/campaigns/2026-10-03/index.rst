@@ -126,10 +126,44 @@ Step 2: the batch path
   ``code``) and ``dftd4`` into the command, before the executor fills in
   ``{NTASKS}``.
 
+Review (design, 2026-10-03)
+===========================
+
+No wrong-physics findings. Fixed, with tests:
+
+#. **Restart identity.** The tasks' fingerprints leave out the INCAR's
+   parallelization keywords (NCORE, KPAR, NPAR, NSIM), so a rerun with another
+   number of ranks reuses the finished calculations. They used to be recomputed.
+#. **Small cells.** A cell narrower than 10 Å is refused at the Gamma point alone;
+   ``options["k_spacing"]`` (1/Å) gives a Gamma-centred mesh and the standard build
+   (``{code}``).
+#. **Tests.** The tests skip the level-grammar check without model_chemistry_step.
+#. **Pin.** ``seamm-exec>=2026.10.3`` is pinned.
+#. **Hard potentials.** PAW-hard includes P_h, S_h and Cl_h, for PF₆⁻ and other
+   electrolytes.
+#. **ENCUT.** An ENCUT below the largest ENMAX is refused.
+#. **Nits.**
+
+   - The resolver falls back to vasp_std when there is no Gamma build.
+   - The ``-D4BJ`` (IVDW = 13) levels are hidden.
+   - LDA potentials go only with the LDA functionals.
+   - The estimate for a cell uses its grid.
+   - The POTCAR is deleted after a successful run.
+
+Also: a ``-D4`` level strips IVDW and VDW_* from the functional, so D4 is never
+added twice.
+
 Noticed, not changed
 ====================
 
-- metadata.py gives plain ``revPBE`` IVDW = 12, the same as ``revPBE-D3BJ``.
+- metadata.py gives plain ``revPBE`` IVDW = 12, the same as ``revPBE-D3BJ``:
+  `vasp-step#13 <https://github.com/molssi-seamm/vasp-step/issues/13>`_.
+- From the review, both pre-existing and to be filed:
+
+  - an ENCUT expression of ENMAX never reaches the substep (``Parameters``
+    refuses the string);
+  - ``initial wavefunction = "random guess"`` tries to copy a file named
+    "random guess".
 - TinkerCliffs' ``/projects/seamm/SEAMM/vasp.ini`` uses
   ``gamma_code = mpiexec -np {NTASKS} vasp_std``. vasp_gam would be faster for
   Gamma-only runs; the prototype used it.

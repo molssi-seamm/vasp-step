@@ -240,7 +240,7 @@ def test_batch_and_substep_write_the_same_inputs(catalog, tmp_path):
 
     db = SystemDB(filename="file:vasp_same?mode=memory&cache=shared")
     try:
-        system, configuration = harness.water_cell(db)
+        system, configuration = harness.water_cell(db, a=12.0)
         energy = vasp_step.Energy()
         for key, value in batch.SETTINGS.items():
             energy.parameters[key].value = value
@@ -353,8 +353,8 @@ def test_model_chemistry_options():
     assert entry["stress_convention"] == "stress" and entry["prefers_batch"]
     assert entry["periodic_native"] and not entry["mdi_capable"]
     assert batch.get_model_chemistry_options(mdi_only=True) == {}
-    from model_chemistry_step.grammar import parse_level
-
+    grammar = pytest.importorskip("model_chemistry_step.grammar")
+    parse_level = grammar.parse_level
     parsed = parse_level("VASP:DFT@r2SCAN-D4/PAW-hard@1200")
     assert (parsed["method"], parsed["basis"], parsed["cutoff"]) == (
         "r2SCAN-D4",
@@ -403,3 +403,95 @@ def test_d4_never_doubles_vasps_own_dispersion(catalog):
     assert keys["GGA"] == "RE"
     assert "IVDW" not in keys and not any(k.startswith("VDW_") for k in keys)
     assert "{dftd4}" in task.cmd and "revpbe" in task.cmd
+
+
+# ---- review fixes -----------------------------------------------------------
+def test_fingerprint_ignores_the_number_of_ranks(catalog):
+    """A rerun with another rank count (NCORE changes) reuses the results; a
+    changed calculation does not."""
+    options = {"grid": {"reference_cell": CELL.tolist()}}
+    a = batch.get_task(
+        geometry("m00"),
+        MC,
+        key="m",
+        options=options,
+        resources=seamm_exec.Resources(ntasks=8),
+    )
+    b = batch.get_task(
+        geometry("m00"),
+        MC,
+        key="m",
+        options=options,
+        resources=seamm_exec.Resources(ntasks=6),
+    )
+    assert incar(a)["NCORE"] == "4" and incar(b)["NCORE"] == "1"
+    assert a.fingerprint == b.fingerprint
+    c = batch.get_task(
+        geometry("m00"),
+        dict(MC, cutoff="1300"),
+        key="m",
+        options=options,
+        resources=seamm_exec.Resources(ntasks=8),
+    )
+    assert c.fingerprint != a.fingerprint
+
+
+def test_small_cells_need_k_points(catalog):
+    silicon = seamm_exec.Geometry(
+        [14, 14],
+        [[0, 0, 0], [1.3567, 1.3567, 1.3567]],
+        cell=[[0, 2.7135, 2.7135], [2.7135, 0, 2.7135], [2.7135, 2.7135, 0]],
+    )
+    mc = dict(MC, method="PBE", basis="PAW", cutoff=None)
+    catalog["potpaw_PBE.64"]["Si"] = dict(catalog["potpaw_PBE.64"]["O"])
+    with pytest.raises(ValueError, match="k_spacing"):
+        batch.get_task(silicon, mc, key="si")
+    task = batch.get_task(silicon, mc, key="si", options={"k_spacing": 0.25})
+    lines = task.files["KPOINTS"].splitlines()
+    assert lines[2] == "Gamma" and lines[3] != "1 1 1"
+    assert task.cmd[0] == "{code}"
+
+
+def test_encut_below_enmax_is_refused(catalog):
+    mc = dict(MC, cutoff="500")  # O_h has ENMAX 765 here
+    with pytest.raises(ValueError, match="below the largest ENMAX"):
+        batch.get_task(
+            geometry("m00"),
+            mc,
+            key="m",
+            options={"grid": {"reference_cell": CELL.tolist()}},
+        )
+
+
+def test_hard_potentials_for_electrolytes():
+    from vasp_step.potentials import potentials_for
+
+    hard = potentials_for("potpaw_PBE.64", ["P", "S", "Cl", "Li"], variant="hard")
+    assert hard == {"P": "P_h", "S": "S_h", "Cl": "Cl_h", "Li": "Li_sv"}
+
+
+def test_options_hide_vasps_own_d4_and_route_lda():
+    options = batch.get_model_chemistry_options()
+    assert not any(name.endswith("-D4BJ") for name in options)
+    assert options["PW92"]["model_chemistry"].endswith("/PAW-LDA")
+    assert options["RSHXLDA"]["model_chemistry"].endswith("/PAW")
+
+
+def test_potcar_is_removed_after_the_run(catalog):
+    task = batch.get_task(
+        geometry("m00"),
+        MC,
+        key="m",
+        options={"grid": {"reference_cell": CELL.tolist()}},
+    )
+    assert task.cmd[-4:] == ["&&", "rm", "-f", "POTCAR"]
+    assert "POTCAR" not in task.return_files
+
+
+def test_resolver_falls_back_to_vasp_std(monkeypatch):
+    found = {"vasp_std": "/usr/bin/vasp_std"}
+    monkeypatch.setattr(resolver.shutil, "which", lambda name: found.get(name))
+    _, cmd, _ = resolver.resolve({}, ["{gamma_code}", "x"], {}, {}, "/r")
+    assert cmd == ["mpiexec -np {NTASKS} vasp_std", "x"]
+    _, cmd, _ = resolver.resolve({}, ["{code}"], {}, {}, "/r")
+    assert cmd == ["mpiexec -np {NTASKS} vasp_std"]

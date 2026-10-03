@@ -39,18 +39,28 @@ def resolve(config, cmd, env, ce, root):
     code = (config.get("code") or "").strip()
     if gamma == "":
         gamma = code
+    if code == "":
+        for name in ("vasp_std", "vasp_gam"):
+            if shutil.which(name) is not None:
+                code = "mpiexec -np {NTASKS} " + name
+                break
     if gamma == "":
-        if shutil.which("vasp_gam") is None:
-            raise RuntimeError(
-                "Could not find VASP: set 'gamma_code' (e.g. 'mpiexec -np {NTASKS} "
-                f"vasp_gam') in the [local] section of {root}/vasp.ini."
-            )
-        gamma = "mpiexec -np {NTASKS} vasp_gam"
+        if shutil.which("vasp_gam") is not None:
+            gamma = "mpiexec -np {NTASKS} vasp_gam"
+        else:
+            gamma = code
+    if gamma == "" and code == "":
+        raise RuntimeError(
+            "Could not find VASP: set 'code' and 'gamma_code' (e.g. 'mpiexec -np "
+            f"{{NTASKS}} vasp_gam') in the [local] section of {root}/vasp.ini."
+        )
 
     resolved = []
     for word in cmd:
         if word == "{gamma_code}":
             resolved.append(gamma)
+        elif word == "{code}":
+            resolved.append(code or gamma)
         elif word == "{dftd4}":
             dftd4 = (config.get("dftd4") or "").strip() or shutil.which("dftd4")
             if not dftd4:
