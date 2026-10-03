@@ -4,16 +4,11 @@
 User Guide
 **********
 
-..
-    <remove the dots above and this line and unindent the toctree to expose it>
-    Contents:
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
 
-    .. toctree::
-       :glob:
-       :maxdepth: 2
-       :titlesonly:
-
-       *
+   model_chemistry
 
 Indices and tables
 ==================

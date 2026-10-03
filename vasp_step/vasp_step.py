@@ -93,3 +93,35 @@ class VASPStep(object):
         description : dict(str, str)
         """
         return VASPStep.my_description
+
+    # ------------------------------------------------------------------
+    # The Model Chemistry batch contract (see vasp_step.batch)
+    # ------------------------------------------------------------------
+    @classmethod
+    def get_model_chemistry_options(cls, periodic_only=False, mdi_only=False):
+        """VASP's model chemistries, ``VASP:DFT@<functional>/<potentials>``."""
+        from .batch import get_model_chemistry_options
+
+        return get_model_chemistry_options(periodic_only, mdi_only)
+
+    @classmethod
+    def get_task(cls, configuration, model_chemistry, **kwargs):
+        """A task computing VASP's energy, forces and stress for one structure."""
+        from .batch import get_task
+
+        return get_task(configuration, model_chemistry, **kwargs)
+
+    @classmethod
+    def can_run_task(cls, configuration, model_chemistry, **kwargs):
+        """Whether :meth:`get_task` can run this structure."""
+        from .batch import can_run_task
+
+        return can_run_task(configuration, model_chemistry, **kwargs)
+
+    @classmethod
+    def analyze_task(cls, result, model_chemistry, configuration, **kwargs):
+        """The energy (kJ/mol), gradients (kJ/mol/Å) and stress (GPa, sigma = -P)
+        of a finished task from :meth:`get_task`."""
+        from .batch import analyze_task
+
+        return analyze_task(result, model_chemistry, configuration, **kwargs)
