@@ -84,6 +84,17 @@ On each machine that runs the tasks, ``vasp.ini`` gives the commands:
 The POTCARs are read where the tasks are made, from the VASP potential library
 (``<SEAMM>/Parameters/VASP``), so that machine needs the library.
 
+Cost and time limits
+--------------------
+
+Each calculation carries an estimate of its wall time. It is fitted to the VASP step's
+own timing records on ARC's TinkerCliffs (about 400,000 Gamma-point single points on
+8 ranks), from the valence electrons and the plane-wave grid (volume × (ENCUT/500 eV)^1.5).
+It is within a factor of 1.3 for two thirds of those runs, and within that of the
+medians of the MBE prototype's 64,656 runs. The estimate decides how many calculations
+share a batch job. A cell, which runs alone, also gets a time limit of three times its
+estimate, at least an hour.
+
 Results
 -------
 
