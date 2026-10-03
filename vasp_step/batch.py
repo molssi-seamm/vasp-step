@@ -182,8 +182,10 @@ def can_run_task(configuration, model_chemistry, *, options=None):
 
 #: The cost model, fitted to the VASP step's timing records on ARC's TinkerCliffs
 #: (~/.seamm.d/timing/vasp.csv: 396,528 Gamma-point single points on 8 ranks,
-#: r2SCAN(-D3BJ), 1-432 atoms, 2025-12 to 2026-04):
+#: r2SCAN(-D3BJ), 1-432 atoms, 2025-12 to 2026-04)::
+#:
 #:     log t = a + b log(Ne) + c log(V (ENCUT/500 eV)^1.5)
+#:
 #: with Ne the valence electrons and V the cell volume (Å³). R² = 0.67 in log t;
 #: 68% of the runs within a factor of 1.3, 95% within 2. The 64,656 VASP runs of
 #: the MBE prototype (EDIFF 1e-7, ALGO All, 1200 eV, hard PAW) fall at 1.09
