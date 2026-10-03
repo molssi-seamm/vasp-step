@@ -158,12 +158,14 @@ Noticed, not changed
 
 - metadata.py gives plain ``revPBE`` IVDW = 12, the same as ``revPBE-D3BJ``:
   `vasp-step#13 <https://github.com/molssi-seamm/vasp-step/issues/13>`_.
-- From the review, both pre-existing and to be filed:
+- From the review, both pre-existing:
 
   - an ENCUT expression of ENMAX never reaches the substep (``Parameters``
-    refuses the string);
+    refuses the string):
+    `vasp-step#15 <https://github.com/molssi-seamm/vasp-step/issues/15>`_;
   - ``initial wavefunction = "random guess"`` tries to copy a file named
-    "random guess".
+    "random guess":
+    `vasp-step#16 <https://github.com/molssi-seamm/vasp-step/issues/16>`_.
 - TinkerCliffs' ``/projects/seamm/SEAMM/vasp.ini`` uses
   ``gamma_code = mpiexec -np {NTASKS} vasp_std``. vasp_gam would be faster for
   Gamma-only runs; the prototype used it.
