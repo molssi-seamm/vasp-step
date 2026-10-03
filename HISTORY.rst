@@ -1,6 +1,13 @@
 =======
 History
 =======
+2026.10.3.1 -- Realistic time estimates for VASP tasks
+    * The estimated time of a VASP calculation, which decides how calculations are
+      bundled into batch jobs, is now fitted to about 400,000 VASP runs on ARC's
+      TinkerCliffs and checked against the MBE prototype's 64,656: it was up to five times
+      too low for large cells.
+    * A periodic cell's calculation gets a time limit of three times its estimate, at
+      least an hour.
 2026.10.3 -- VASP as a model chemistry, for the MBE step
     * VASP can be used as a model chemistry, ``VASP:DFT@<functional>/<potentials>@<ENCUT>``
       (e.g. ``VASP:DFT@r2SCAN-D4/PAW-hard@1200``), so steps that evaluate many structures

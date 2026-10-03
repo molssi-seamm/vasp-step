@@ -495,3 +495,47 @@ def test_resolver_falls_back_to_vasp_std(monkeypatch):
     assert cmd == ["mpiexec -np {NTASKS} vasp_std", "x"]
     _, cmd, _ = resolver.resolve({}, ["{code}"], {}, {}, "/r")
     assert cmd == ["mpiexec -np {NTASKS} vasp_std"]
+
+
+# ---- the cost estimate ----------------------------------------------------------
+def test_estimate_matches_the_prototype_medians():
+    """The fit on ARC's VASP timing records against the medians of the MBE
+    prototype's 64,656 runs (r2SCAN, 1200 eV, 12.43-12.63 Å boxes)."""
+    volume = 12.4297**3
+    for nelect, ntasks, median in ((8, 8, 443.0), (16, 8, 541.0), (512, 16, 4230.0)):
+        estimate = batch.estimated_seconds(nelect, volume, 1200.0, ntasks)
+        assert 1 / 1.3 < estimate / median < 1.3, (nelect, estimate)
+    # fewer ranks are slower in proportion; more ranks help less
+    one = batch.estimated_seconds(16, volume, 1200.0, 1)
+    eight = batch.estimated_seconds(16, volume, 1200.0, 8)
+    sixteen = batch.estimated_seconds(16, volume, 1200.0, 16)
+    assert one == pytest.approx(8 * eight) and eight / sixteen == pytest.approx(2**0.5)
+    # the slowest prototype cell (a dense frame) took 11,494 s
+    cell = batch.estimated_seconds(512, volume, 1200.0, 16)
+    assert batch.cell_walltime(cell) >= 11494
+    assert batch.cell_walltime(10.0) == 3600
+
+
+def test_cells_get_a_time_limit_and_fragments_do_not(catalog):
+    resources = seamm_exec.Resources(ntasks=16)
+    cell = seamm_exec.Geometry([8, 1, 1] * 64, X, cell=CELL)
+    task = batch.get_task(
+        cell,
+        MC,
+        key="cell",
+        properties=("energy", "gradients", "stress"),
+        options={"grid": {"max_spacing": 0.0829}},
+        resources=resources,
+    )
+    assert task.resources.walltime == batch.cell_walltime(task.estimated_seconds)
+    assert resources.walltime is None  # the caller's object is not changed
+    assert 3000 < task.estimated_seconds < 6000
+    fragment = batch.get_task(
+        geometry("m00"),
+        MC,
+        key="m",
+        options={"grid": {"reference_cell": CELL.tolist()}},
+        resources=seamm_exec.Resources(ntasks=8),
+    )
+    assert fragment.resources.walltime is None
+    assert 300 < fragment.estimated_seconds < 600

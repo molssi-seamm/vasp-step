@@ -40,6 +40,7 @@ The POTCARs are read where the task is built, from the VASP potential library
 (``<SEAMM>/Parameters/VASP``, catalogued by the VASP step) on that machine.
 """
 
+import dataclasses
 import json
 import math
 
@@ -179,12 +180,55 @@ def can_run_task(configuration, model_chemistry, *, options=None):
     return data["periodicity"] == 0 and "reference_cell" in (options.get("grid") or {})
 
 
-def estimated_seconds(n_atoms, ng, ntasks):
-    """A cost estimate calibrated on the MBE prototype: a water fragment in a
-    150³ grid took ~330 s on 8 ranks of TinkerCliffs, the 192-atom cell ~1100 s
-    on 16."""
-    points = float(np.prod(ng)) / 150**3 if ng else 1.0
-    return 330.0 * points * math.sqrt(max(n_atoms, 3) / 6.0) * 8.0 / max(1, ntasks)
+#: The cost model, fitted to the VASP step's timing records on ARC's TinkerCliffs
+#: (~/.seamm.d/timing/vasp.csv: 396,528 Gamma-point single points on 8 ranks,
+#: r2SCAN(-D3BJ), 1-432 atoms, 2025-12 to 2026-04)::
+#:
+#:     log t = a + b log(Ne) + c log(V (ENCUT/500 eV)^1.5)
+#:
+#: with Ne the valence electrons and V the cell volume (Å³). R² = 0.67 in log t;
+#: 68% of the runs within a factor of 1.3, 95% within 2. The 64,656 VASP runs of
+#: the MBE prototype (EDIFF 1e-7, ALGO All, 1200 eV, hard PAW) fall at 1.09
+#: (monomers) and 0.86 (pairs) of it on 8 ranks, so no settings factor is needed.
+COST_FIT = (-7.209, 0.636, 1.342)
+#: Above 8 ranks the speed grows as ranks**0.5 (the prototype's 16-rank runs were
+#: 1.4-1.6x faster than its 8-rank ones); below, in proportion to the ranks.
+RANK_EXPONENT = 0.5
+
+
+def estimated_seconds(nelect, volume, encut, ntasks, kpoints=1):
+    """The expected wall time (s) of one VASP calculation on TinkerCliffs-like
+    nodes: see :data:`COST_FIT`.
+
+    Parameters
+    ----------
+    nelect : float
+        Valence electrons.
+    volume : float
+        The cell (or box) volume, Å³.
+    encut : float
+        Plane-wave cutoff, eV.
+    ntasks : int
+        MPI ranks.
+    kpoints : int
+        k-points in the mesh (an upper bound on the irreducible ones).
+    """
+    a, b, c = COST_FIT
+    grid = volume * (encut / 500.0) ** 1.5
+    t8 = math.exp(a + b * math.log(max(nelect, 1.0)) + c * math.log(grid))
+    ntasks = max(1, int(ntasks))
+    if ntasks <= 8:
+        scale = 8.0 / ntasks
+    else:
+        scale = (8.0 / ntasks) ** RANK_EXPONENT
+    return t8 * scale * max(1, int(kpoints))
+
+
+def cell_walltime(estimate):
+    """The time limit (s) for a cell's calculation: 3x the estimate, at least an
+    hour, in quarter hours. The prototype's slowest cell (a dense frame) took
+    2.8x the median."""
+    return max(3600.0, math.ceil(3.0 * estimate / 900.0) * 900.0)
 
 
 def _zval(potcar):
@@ -371,11 +415,21 @@ def get_task(
         success["dftd4.json"] = "energy"
         return_files += ["dftd4.json", "dftd4.out", "fragment.xyz"]
 
+    # The cost estimate, and a time limit for a cell, which runs alone
+    counts = inputs.atom_order(atnos)[2]
+    unique = sorted(set(atnos), reverse=True)
+    nelect = sum(z * counts[a] for z, a in zip(_zval(potcar), unique)) - charge
+    volume = abs(np.linalg.det(np.asarray(cell, dtype=float)))
+    mesh = [int(x) for x in kpoints.splitlines()[3].split()[:3]]
+    estimate = estimated_seconds(nelect, volume, encut, ntasks, int(np.prod(mesh)))
+
     # The licensed POTCAR is not left behind in the task's directory
     cmd += ["&&", "rm", "-f", "POTCAR"]
 
     if resources is None:
         resources = seamm_exec.Resources(ntasks=ntasks, mem_per_cpu=2_000_000_000)
+    if periodic and resources.walltime is None:
+        resources = dataclasses.replace(resources, walltime=cell_walltime(estimate))
     return seamm_exec.Task(
         key=key,
         program="vasp",
@@ -384,9 +438,7 @@ def get_task(
         files=files,
         return_files=return_files,
         resources=resources,
-        estimated_seconds=estimated_seconds(
-            len(atnos), ng or grid_.cell_grid(cell), ntasks
-        ),
+        estimated_seconds=estimate,
         success_text=success,
         fingerprint=fingerprint(cmd, files),
     )

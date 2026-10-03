@@ -153,6 +153,37 @@ No wrong-physics findings. Fixed, with tests:
 Also: a ``-D4`` level strips IVDW and VDW_* from the functional, so D4 is never
 added twice.
 
+The cost estimate (after C.1)
+=============================
+
+C.1's first cell job hit its 1 h limit: the old estimate (330 s × grid/150³ × √(atoms/6)
+× 8/ranks, from one fragment) gave 930 s for the 64-water cell, which took 4,822 s.
+
+- **The data.**
+
+  - The VASP step's timing file on TinkerCliffs (``~/.seamm.d/timing/vasp.csv``,
+    1.7 GB) holds 434,729 runs. 396,528 of them are Gamma-point single points on 8
+    ranks with known electrons: r2SCAN(-D3BJ), 1-432 atoms, 2025-12 to 2026-04.
+  - The prototype's 64,656 VASP runs at the MBE settings, from the frames'
+    ``vasp.tar.gz``.
+
+  The per-run tables are ``/projects/seamm/psaxe/mbe_c1/vasp_timing_features.csv.gz``
+  and ``mbe_vasp_timings.csv``.
+- **The fit.** log t = −7.209 + 0.636 log Ne + 1.342 log(V (ENCUT/500)^1.5) (s on 8
+  ranks).
+
+  - R² = 0.67 in log t; 68% of runs within ×1.3, 95% within ×2.
+  - Against the prototype on 8 ranks the median real/fit is 1.09 for monomers and
+    0.86 for pairs, so no settings factor is needed.
+  - Rank scaling: the prototype's 16-rank runs were 1.4-1.6× faster, so speed ∝
+    ranks^0.5 above 8 and ∝ ranks below.
+- **A cell's time limit.** A cell gets ``Resources.walltime`` = 3 × the estimate, at
+  least 1 h. The prototype's slowest cell, a dense frame, took 2.8× the median. A
+  fragment keeps the bundle's walltime.
+- **The timing file.** It is large because every row carries the full
+  POSCAR/INCAR/KPOINTS, and one line had NUL bytes (concurrent appends without a
+  lock). Node medians range 0.68-1.40× the fit; tc103 is the slowest.
+
 Noticed, not changed
 ====================
 
