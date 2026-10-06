@@ -546,7 +546,7 @@ def analyze_task(
 def _record_timing(task, result, outcar, model_chemistry, configuration):
     """The timing record of a model-chemistry task; never raises."""
     try:
-        from .energy import timing_descriptors
+        from .energy import _record_kwargs, timing_descriptors
 
         files = dict(getattr(task, "files", {}) or {})
         for name in ("INCAR", "KPOINTS", "POSCAR", "POTCAR"):
@@ -559,7 +559,7 @@ def _record_timing(task, result, outcar, model_chemistry, configuration):
             or model_chemistry
         )
         descriptors = timing_descriptors(files, outcar, configuration, model=method)
-        seamm_exec.record_task_timing(task, result, descriptors)
+        seamm_exec.record_task_timing(task, result, descriptors, **_record_kwargs())
     except Exception as e:  # pragma: no cover
         import logging
 

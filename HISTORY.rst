@@ -1,6 +1,14 @@
 =======
 History
 =======
+2026.10.7 -- The step declares what its cost model is made of
+    * ``energy.TIMING_SPEC`` -- valence electrons and the grid volume (the cell
+      volume scaled by (ENCUT/500 eV)^1.5, now a descriptor of the record) as size
+      variables, the functional as the method class, the task, ionic steps as the
+      unit, k-points as a multiplier -- is passed when a run is recorded (seamm-exec
+      2026.10.7 writes it beside the records), so the cost model is fitted from the
+      step's own description rather than a table in seamm-exec.
+
 2026.10.6 -- Timing records that a cost model can be fitted to
     * Each VASP run -- the Energy step's, and a model-chemistry task when
       ``analyze_task`` is given its task -- appends a record to

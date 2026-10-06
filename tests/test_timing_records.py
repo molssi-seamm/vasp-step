@@ -47,6 +47,7 @@ def test_descriptors():
     assert d["task"] == "energy"
     assert d["kpoints"] == 1
     assert d["n_atoms"] == 10 and d["n_heavy"] == 6 and d["volume"] == 3375.0
+    assert abs(d["grid"] - 3375.0 * (1200.0 / 500.0) ** 1.5) < 1e-6
     assert d["nelect"] == 3 * 4 + 4 * 1 + 3 * 6
     assert d["mpi_ranks"] == 16
     assert d["electronic_steps"] == 21 and d["ionic_steps"] == 1
@@ -65,3 +66,10 @@ def test_task_kinds():
     )
     assert timing_descriptors({"INCAR": ""}, None)["task"] == "energy"
     assert timing_descriptors({}, None)["task"] == "energy"
+
+
+def test_timing_spec():
+    from vasp_step import energy
+
+    assert energy.TIMING_SPEC["size"] == ["nelect", "grid"]
+    assert energy.TIMING_SPEC["multiplier"] == "kpoints"

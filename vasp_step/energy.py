@@ -167,6 +167,26 @@ standard_state = {
 }
 
 
+#: What VASP's cost model is made of (seamm_exec.timing_model.Spec as plain
+#: data): valence electrons and the grid volume (cell volume scaled by
+#: (ENCUT/500 eV)^1.5, a descriptor written below) as size variables, the
+#: functional as the method class, the task, ionic steps as the unit, k-points
+#: as a multiplier; ranks^0.5 above 8 (the MBE prototype's measurement).
+TIMING_SPEC = {
+    "size": ["nelect", "grid"],
+    "klass": ["model"],
+    "task": "task",
+    "units": "ionic_steps",
+    "multiplier": "kpoints",
+    "default_alpha": 0.5,
+}
+
+
+def _record_kwargs():
+    """``spec=`` for seamm-exec releases that take it (2026.10.7 on)."""
+    return {"spec": TIMING_SPEC} if hasattr(seamm_exec, "TimingSpec") else {}
+
+
 def _incar_value(incar, key):
     """The value of ``key`` in an INCAR's text, or None."""
     m = re.search(rf"^\s*{key}\s*=\s*([^;#!\n]+)", incar or "", re.M | re.I)
@@ -221,6 +241,11 @@ def timing_descriptors(files, outcar, configuration=None, model="", potentials="
             d["kpoints"] = None
     if configuration is not None:
         d.update(seamm_exec.structure_descriptors(configuration))
+    # The cost model's grid variable: the cell volume scaled by the cutoff
+    volume = d.get("volume")
+    encut = d.get("encut")
+    if volume and encut:
+        d["grid"] = float(volume) * (float(encut) / 500.0) ** 1.5
     potcar = files.get("POTCAR", "") if files else ""
     poscar = files.get("POSCAR", "") if files else ""
     if potcar and poscar:
@@ -1330,6 +1355,7 @@ class Energy(seamm.Node):
                 ntasks=n_threads,
                 state="finished" if result else "failed",
                 in_situ=True,
+                **_record_kwargs(),
             )
         except Exception as e:  # pragma: no cover - must never stop the step
             self.logger.warning(f"Could not record the timing of the VASP run: {e}")
