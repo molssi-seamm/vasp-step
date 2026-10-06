@@ -6,7 +6,7 @@ History
       volume scaled by (ENCUT/500 eV)^1.5, now a descriptor of the record) as size
       variables, the functional as the method class, the task, ionic steps as the
       unit, k-points as a multiplier -- is passed when a run is recorded (seamm-exec
-      2026.10.7 writes it beside the records), so the cost model is fitted from the
+      2026.10.6.1 writes it beside the records), so the cost model is fitted from the
       step's own description rather than a table in seamm-exec.
 
 2026.10.6 -- Timing records that a cost model can be fitted to
