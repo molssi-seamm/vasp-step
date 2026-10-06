@@ -37,7 +37,7 @@ def test_no_potentials_chosen_uses_the_defaults(db, tmp_path):
     system, configuration = harness.lif(db)
     energy = vasp_step.Energy()
     energy._id = (1, 1)
-    energy._timing_data = None
+    pass
     energy.get_system_configuration = lambda *a, **k: (system, configuration)
     from types import SimpleNamespace
 

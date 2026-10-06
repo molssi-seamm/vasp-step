@@ -500,13 +500,19 @@ def analyze_task(
     *,
     properties=("energy", "gradients"),
     options=None,
+    task=None,
 ):
     """{"energy": kJ/mol, "gradients": (n, 3) kJ/mol/Å, "stress": (3, 3) GPa,
-    sigma = -P} of a finished task, in the structure's atom order."""
+    sigma = -P} of a finished task, in the structure's atom order.
+
+    Given the ``task`` that produced the result, its timing record is appended
+    too (``seamm_exec.record_task_timing``), as the VASP step's own runs do."""
     data = structure_data(configuration)
     atnos = list(data["atomic_numbers"])
     periodic = data["periodicity"] == 3
     outcar = _text(result, "OUTCAR")
+    if task is not None:
+        _record_timing(task, result, outcar, model_chemistry, configuration)
     if not converged(outcar):
         raise AnalysisError(f"'{result.key}': the SCF did not converge (EDIFF)")
     energy, forces, stress = parse_vasprun(_text(result, "vasprun.xml"))
@@ -535,6 +541,31 @@ def analyze_task(
         out["stress"] = sigma.tolist()
     check_properties(out, properties, f"'{result.key}'", periodic=periodic)
     return out
+
+
+def _record_timing(task, result, outcar, model_chemistry, configuration):
+    """The timing record of a model-chemistry task; never raises."""
+    try:
+        from .energy import timing_descriptors
+
+        files = dict(getattr(task, "files", {}) or {})
+        for name in ("INCAR", "KPOINTS", "POSCAR", "POTCAR"):
+            if name not in files:
+                text = _text(result, name)
+                if text:
+                    files[name] = text
+        method = str(
+            getattr(model_chemistry, "get", lambda k, d="": d)("method", "")
+            or model_chemistry
+        )
+        descriptors = timing_descriptors(files, outcar, configuration, model=method)
+        seamm_exec.record_task_timing(task, result, descriptors)
+    except Exception as e:  # pragma: no cover
+        import logging
+
+        logging.getLogger(__name__).warning(
+            f"Could not record the timing of VASP task {task.key}: {e}"
+        )
 
 
 def _text(result, name):

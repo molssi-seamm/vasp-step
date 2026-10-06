@@ -1,6 +1,18 @@
 =======
 History
 =======
+2026.10.6 -- Timing records that a cost model can be fitted to
+    * Each VASP run -- the Energy step's, and a model-chemistry task when
+      ``analyze_task`` is given its task -- appends a record to
+      ``~/.seamm.d/timing/vasp.csv`` through ``seamm_exec.timing``: the machine
+      class, ranks, wall time and outcome, and the descriptors of the calculation
+      -- the variables of the cost model (valence electrons, cell volume, ENCUT,
+      k-points), ALGO, EDIFF, PREC, ISPIN, IBRION/NSW, the functional and
+      potentials, the atoms, and from the OUTCAR the electronic and ionic steps,
+      ranks and VASP's own times. This replaces the step's own CSV, which carried
+      the POSCAR, INCAR and KPOINTS text and grew without bound (#18). See
+      seamm_exec's campaign of 2026-10-05.
+    * Requires seamm-exec 2026.10.6.
 2026.10.3.1 -- Realistic time estimates for VASP tasks
     * The estimated time of a VASP calculation, which decides how calculations are
       bundled into batch jobs, is now fitted to about 400,000 VASP runs on ARC's
