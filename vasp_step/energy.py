@@ -4,19 +4,16 @@
 
 from collections import Counter
 import configparser
-import csv
-from datetime import datetime, timezone
 import importlib
 import logging
 from math import isnan
 from pathlib import Path
-import platform
 import pprint  # noqa: F401
+import re
 import shutil
 import textwrap
 import time
 
-from cpuinfo import get_cpu_info
 import h5py
 from lxml import etree
 import numpy as np
@@ -170,6 +167,93 @@ standard_state = {
 }
 
 
+def _incar_value(incar, key):
+    """The value of ``key`` in an INCAR's text, or None."""
+    m = re.search(rf"^\s*{key}\s*=\s*([^;#!\n]+)", incar or "", re.M | re.I)
+    return m.group(1).strip() if m else None
+
+
+def timing_descriptors(files, outcar, configuration=None, model="", potentials=""):
+    """The descriptors of a VASP run for its timing record (seamm_exec's
+    campaign of 2026-10-05): the variables of the cost model -- valence
+    electrons, cell volume, ENCUT, k-points -- plus the settings that change
+    the cost (ALGO, EDIFF, PREC, ISPIN, IBRION/NSW) and the functional, and from
+    the OUTCAR the electronic and ionic steps, the ranks and VASP's own times.
+    Replaces the POSCAR/INCAR/KPOINTS text the old records carried.
+    """
+    d = {}
+    incar = files.get("INCAR", "") if files else ""
+    d["model"] = model
+    d["potentials"] = potentials
+    for key in (
+        "ENCUT",
+        "ALGO",
+        "EDIFF",
+        "EDIFFG",
+        "PREC",
+        "ISPIN",
+        "IBRION",
+        "NSW",
+        "ISMEAR",
+        "LDIPOL",
+    ):
+        d[key.lower()] = _incar_value(incar, key)
+    for key in ("encut", "ediff", "ediffg"):
+        try:
+            d[key] = float(d[key]) if d[key] is not None else None
+        except ValueError:
+            pass
+    nsw = d.get("nsw")
+    ibrion = d.get("ibrion")
+    if ibrion in ("5", "6", "7", "8"):
+        d["task"] = "force"
+    elif nsw not in (None, "0", "1") and ibrion not in (None, "-1"):
+        d["task"] = "opt"
+    else:
+        d["task"] = "energy"
+    kpoints = files.get("KPOINTS", "") if files else ""
+    lines = [ln for ln in kpoints.splitlines() if ln.strip()]
+    if len(lines) >= 4:
+        try:
+            mesh = [int(x) for x in lines[3].split()[:3]]
+            d["kpoints"] = mesh[0] * mesh[1] * mesh[2]
+        except (ValueError, IndexError):
+            d["kpoints"] = None
+    if configuration is not None:
+        d.update(seamm_exec.structure_descriptors(configuration))
+    potcar = files.get("POTCAR", "") if files else ""
+    poscar = files.get("POSCAR", "") if files else ""
+    if potcar and poscar:
+        try:
+            from .batch import _zval
+
+            zvals = _zval(potcar)
+            plines = poscar.splitlines()
+            counts = [int(x) for x in plines[6].split()]
+            if len(counts) == len(zvals):
+                d["nelect"] = sum(z * n for z, n in zip(zvals, counts))
+        except Exception:
+            pass
+    if outcar:
+        m = re.search(r"running\s+(\d+)\s+mpi-ranks", outcar)
+        d["mpi_ranks"] = int(m.group(1)) if m else None
+        m = re.search(r"NELECT\s*=\s*([\d.]+)", outcar)
+        if m and "nelect" not in d:
+            d["nelect"] = float(m.group(1))
+        m = re.search(r"NKPTS\s*=\s*(\d+)", outcar)
+        d["nkpts"] = int(m.group(1)) if m else None
+        m = re.search(r"NBANDS\s*=\s*(\d+)", outcar)
+        d["nbands"] = int(m.group(1)) if m else None
+        d["electronic_steps"] = len(re.findall(r"^-+ Iteration", outcar, re.M))
+        d["ionic_steps"] = outcar.count("LOOP+")
+        m = re.search(r"Elapsed time \(sec\):\s*([\d.]+)", outcar)
+        d["code_seconds"] = float(m.group(1)) if m else None
+        m = re.search(r"Total CPU time used \(sec\):\s*([\d.]+)", outcar)
+        d["cpu_seconds"] = float(m.group(1)) if m else None
+        d["terminated_normally"] = "General timing and accounting" in outcar
+    return d
+
+
 class Energy(seamm.Node):
     """
     The non-graphical part of a Energy step in a flowchart.
@@ -237,47 +321,8 @@ class Energy(seamm.Node):
 
         self._gamma_point_only = False
 
-        self._timing_data = []
-        self._timing_path = Path("~/.seamm.d/timing/vasp.csv").expanduser()
-
-        # Set up the timing information
-        self._timing_header = [
-            "node",  # 0
-            "cpu",  # 1
-            "cpu_version",  # 2
-            "cpu_count",  # 3
-            "cpu_speed",  # 4
-            "date",  # 5
-            "POSCAR",  # 6
-            "INCAR",  # 7
-            "KPOINTS",  # 8
-            "potentials",  # 9
-            "formula",  # 10
-            "model",  # 11
-            "nproc",  # 12
-            "time",  # 13
-        ]
-        try:
-            self._timing_path.parent.mkdir(parents=True, exist_ok=True)
-
-            self._timing_data = 14 * [""]
-            self._timing_data[0] = platform.node()
-            tmp = get_cpu_info()
-            if "arch" in tmp:
-                self._timing_data[1] = tmp["arch"]
-            if "cpuinfo_version_string" in tmp:
-                self._timing_data[2] = tmp["cpuinfo_version_string"]
-            if "count" in tmp:
-                self._timing_data[3] = str(tmp["count"])
-            if "hz_advertized_friendly" in tmp:
-                self._timing_data[4] = tmp["hz_advertized_friendly"]
-
-            if not self._timing_path.exists():
-                with self._timing_path.open("w", newline="") as fd:
-                    writer = csv.writer(fd)
-                    writer.writerow(self._timing_header)
-        except Exception:
-            self._timing_data = None
+        self._timing_model = ""
+        self._timing_potentials = ""
 
     @property
     def header(self):
@@ -609,11 +654,6 @@ class Energy(seamm.Node):
 
                 self.logger.debug(f"{cmd=}")
 
-                if self._timing_data is not None:
-                    self._timing_data[5] = datetime.now(timezone.utc).isoformat()
-                    self._timing_data[6] = files["POSCAR"]
-                    self._timing_data[7] = files["INCAR"]
-                    self._timing_data[8] = files["KPOINTS"]
                 t0 = time.time_ns()
                 result = executor.run(
                     ce=ce,
@@ -627,22 +667,15 @@ class Energy(seamm.Node):
                 )
 
                 t = (time.time_ns() - t0) / 1.0e9
-                if self._timing_data is not None:
-                    self._timing_data[12] = str(n_threads)
-                    self._timing_data[13] = f"{t:.3f}"
+                self._wall_time = t
+                self._n_threads = n_threads
+                self.record_timing(
+                    files, directory, starting_configuration, t, n_threads, result
+                )
 
                 if not result:
                     self.logger.error("There was an error running VASP")
                     return None
-
-                if self._timing_data is not None:
-                    try:
-                        with self._timing_path.open("a", newline="") as fd:
-                            writer = csv.writer(fd)
-                            writer.writerow(self._timing_data)
-                    except Exception:
-                        # Don't want an error with timing to be fatal
-                        pass
 
         if not input_only:
             # Checkout that the main output exists
@@ -742,9 +775,9 @@ class Energy(seamm.Node):
             results["energy/atom"] = float(results["energy"]) / n_atoms
 
         # Adding timing info
-        if self._timing_data is not None:
-            results["SEAMM elapsed time"] = self._timing_data[13]
-            results["SEAMM np"] = self._timing_data[12]
+        if getattr(self, "_wall_time", None) is not None:
+            results["SEAMM elapsed time"] = f"{self._wall_time:.3f}"
+            results["SEAMM np"] = str(self._n_threads)
 
         if table is None:
             table = {
@@ -1277,6 +1310,30 @@ class Energy(seamm.Node):
 
         return files
 
+    def record_timing(self, files, directory, configuration, wall, n_threads, result):
+        """Append this run's timing record (``~/.seamm.d/timing/vasp.csv``) with
+        :func:`timing_descriptors`; never raises."""
+        try:
+            outcar = Path(directory) / "OUTCAR"
+            text = outcar.read_text(errors="replace") if outcar.exists() else None
+            descriptors = timing_descriptors(
+                files,
+                text,
+                configuration,
+                model=self._timing_model,
+                potentials=self._timing_potentials,
+            )
+            seamm_exec.record_timing(
+                "vasp",
+                wall,
+                descriptors,
+                ntasks=n_threads,
+                state="finished" if result else "failed",
+                in_situ=True,
+            )
+        except Exception as e:  # pragma: no cover - must never stop the step
+            self.logger.warning(f"Could not record the timing of the VASP run: {e}")
+
     def get_INCAR(self, P=None):
         """Get the control input (INCAR) for this calculation."""
         keywords, descriptions = self.get_keywords(P)
@@ -1296,8 +1353,7 @@ class Energy(seamm.Node):
         model_data = self.metadata["computational models"][
             "Density Functional Theory (DFT)"
         ]["models"][model]["parameterizations"]
-        if self._timing_data is not None:
-            self._timing_data[11] = f"{model} / {submodel}"
+        self._timing_model = f"{model} / {submodel}"
 
         # The energy cutoff, which may be an expression of ENMAX. Without the
         # dialog ENMAX may not be set: then it comes from the potentials.
@@ -1382,8 +1438,7 @@ class Energy(seamm.Node):
             self.parent.potential_metadata[potential_set],
             P["potentials"],
         )
-        if self._timing_data is not None:
-            self._timing_data[9] = " ".join(names)
+        self._timing_potentials = " ".join(names)
         return text
 
     def get_KPOINTS(self, P=None):

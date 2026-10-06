@@ -256,7 +256,7 @@ def test_batch_and_substep_write_the_same_inputs(catalog, tmp_path):
         for key, value in values.items():
             energy.parameters[key].value = value
         energy._id = (1, 1)
-        energy._timing_data = None
+        pass
         energy.get_system_configuration = lambda *a, **k: (system, configuration)
         energy.parent = SimpleNamespace(
             potential_metadata=catalog, get_value=lambda v: v
