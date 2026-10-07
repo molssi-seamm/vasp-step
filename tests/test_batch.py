@@ -200,6 +200,8 @@ def test_cell_task(catalog):
     )
     keys = incar(task)
     assert keys["NGX"] == "150" and keys["ISIF"] == "2"
+    # A whole cell uses Davidson: ALGO = All aborts on some cells (EDWAV)
+    assert keys["ALGO"] == "Normal"
     assert "IDIPOL" not in keys and "fragment.xyz" not in task.files
     i = task.cmd.index("{dftd4}")
     assert task.cmd[i + 1] == "POSCAR"
@@ -250,6 +252,8 @@ def test_batch_and_substep_write_the_same_inputs(catalog, tmp_path):
             "plane-wave cutoff": 1200.0,
             "calculate stress": "yes",
             "ncore": 4,
+            # get_task runs a whole cell with Davidson (ALGO = Normal)
+            "electronic method": "normal",
             "potentials": {"O": "O_h", "H": "H_h"},
             "extra keywords": ["ISYM=0", "LWAVE=.FALSE.", "LCHARG=.FALSE."],
         }
@@ -539,3 +543,15 @@ def test_cells_get_a_time_limit_and_fragments_do_not(catalog):
     )
     assert fragment.resources.walltime is None
     assert 300 < fragment.estimated_seconds < 600
+
+
+def test_the_electronic_method_can_be_chosen(catalog):
+    cell = seamm_exec.Geometry([8, 1, 1] * 64, X, cell=CELL)
+    task = batch.get_task(
+        cell,
+        MC,
+        key="c1-cell",
+        options={"grid": {"max_spacing": 0.0829}, "electronic method": "all"},
+        resources=seamm_exec.Resources(ntasks=16),
+    )
+    assert incar(task)["ALGO"] == "All"

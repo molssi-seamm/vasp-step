@@ -9,6 +9,12 @@ History
       2026.10.6.1 writes it beside the records), so the cost model is fitted from the
       step's own description rather than a table in seamm-exec.
     * Removed the unused Docker option from the vasp.ini template.
+    * A whole cell run as a model-chemistry task now uses ALGO = Normal (Davidson)
+      rather than ALGO = All: VASP's conjugate-gradient minimizer aborts
+      reproducibly on some cells ("EDWAV: internal error, the gradient is not
+      orthogonal", e.g. a 32-molecule FEC cell). The converged energy, forces and
+      stress are the same. Fragments keep ALGO = All; ``options["electronic
+      method"]`` chooses another.
 
 2026.10.6 -- Timing records that a cost model can be fitted to
     * Each VASP run -- the Energy step's, and a model-chemistry task when

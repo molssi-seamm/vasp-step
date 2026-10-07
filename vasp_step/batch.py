@@ -315,6 +315,15 @@ def get_task(
     # The same conversion of the values as the substep's (e.g. "no" -> False)
     parameters = vasp_step.EnergyParameters()
     values = dict(SETTINGS)
+    if periodic:
+        # A whole cell is minimized with Davidson (ALGO = Normal): VASP's
+        # conjugate gradient (ALGO = All) aborts reproducibly on some cells,
+        # "EDWAV: internal error, the gradient is not orthogonal" (32 FEC, on 24
+        # and 32 ranks alike). The minimizer does not change the converged
+        # energy, forces or stress at EDIFF 1e-7; fragments keep ALGO = All.
+        values["electronic method"] = "normal"
+    if options.get("electronic method"):
+        values["electronic method"] = options["electronic method"]
     values["model"], values["submodel"] = model, submodel
     values["calculate stress"] = (
         "yes" if (periodic and "stress" in properties) else "no"
