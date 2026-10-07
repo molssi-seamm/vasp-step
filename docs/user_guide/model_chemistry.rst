@@ -35,8 +35,12 @@ The functionals with VASP's own D4 (``-D4BJ``, IVDW = 13) are not offered: they
 need a VASP compiled with DFTD4, which many builds are not. Use ``-D4`` instead.
 
 The calculations use the settings for accurate energies and forces: PREC =
-Accurate, EDIFF = 1e-7, ALGO = All, no symmetry, and no WAVECAR or CHGCAR. The stress
-is computed for a periodic structure when it is asked for. The POTCAR (a licensed
+Accurate, EDIFF = 1e-7, no symmetry, and no WAVECAR or CHGCAR. Fragments (molecules
+in boxes) use ALGO = All. Whole cells use ALGO = Normal (Davidson), because VASP's
+conjugate-gradient minimizer aborts reproducibly on some cells with "EDWAV: internal
+error, the gradient is not orthogonal"; at EDIFF = 1e-7 the converged energy, forces
+and stress do not depend on the minimizer. The ``electronic method`` option chooses
+another. The stress is computed for a periodic structure when it is asked for. The POTCAR (a licensed
 file) is deleted when the calculation finishes.
 
 **k-points.** A cell is sampled at the Gamma point alone, which suits the large

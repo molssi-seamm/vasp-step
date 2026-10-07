@@ -3,7 +3,7 @@ lxml
 numpy
 py-cpuinfo
 seamm
-seamm-exec>=2026.10.6
+seamm-exec>=2026.10.6.1
 seamm-util>=2026.9.27.1
 seamm-widgets
 tabulate

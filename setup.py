@@ -73,9 +73,9 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.12',
     ],
+    python_requires='>=3.12',
     entry_points={
         'org.molssi.seamm': [
             'VASP = vasp_step:VASPStep',
