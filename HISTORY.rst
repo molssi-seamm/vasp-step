@@ -15,6 +15,7 @@ History
       orthogonal", e.g. a 32-molecule FEC cell). The converged energy, forces and
       stress are the same. Fragments keep ALGO = All; ``options["electronic
       method"]`` chooses another.
+    * Requires Python 3.12 and seamm-exec 2026.10.6.1.
 
 2026.10.6 -- Timing records that a cost model can be fitted to
     * Each VASP run -- the Energy step's, and a model-chemistry task when
