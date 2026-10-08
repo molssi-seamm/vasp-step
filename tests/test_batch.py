@@ -166,6 +166,8 @@ def test_fragment_task(catalog):
     assert keys["ISYM"] == "0" and keys["LWAVE"] == ".FALSE."
     assert keys["ISIF"] == "0" and keys["EDIFF"] == "1.00E-07"
     assert keys["PREC"].lower() == "accurate" and keys["ALGO"] == "All"
+    # fragments keep the new line search
+    assert keys["ISEARCH"] == "1"
     assert keys["NCORE"] == "4" and keys["KPAR"] == "1"
     assert "NELECT" not in keys
     # POSCAR: Cartesian, 10 decimals, the prototype's registered coordinates
@@ -200,8 +202,9 @@ def test_cell_task(catalog):
     )
     keys = incar(task)
     assert keys["NGX"] == "150" and keys["ISIF"] == "2"
-    # A whole cell uses Davidson: ALGO = All aborts on some cells (EDWAV)
-    assert keys["ALGO"] == "Normal"
+    # A whole cell uses conjugate gradient with the legacy line search:
+    # ISEARCH = 1 aborts on some cells (EDWAV), Davidson diverges on others
+    assert keys["ALGO"] == "All" and keys["ISEARCH"] == "0"
     assert "IDIPOL" not in keys and "fragment.xyz" not in task.files
     i = task.cmd.index("{dftd4}")
     assert task.cmd[i + 1] == "POSCAR"
@@ -252,10 +255,15 @@ def test_batch_and_substep_write_the_same_inputs(catalog, tmp_path):
             "plane-wave cutoff": 1200.0,
             "calculate stress": "yes",
             "ncore": 4,
-            # get_task runs a whole cell with Davidson (ALGO = Normal)
-            "electronic method": "normal",
+            # get_task runs a whole cell with ALGO = All and ISEARCH = 0
+            "electronic method": "all",
             "potentials": {"O": "O_h", "H": "H_h"},
-            "extra keywords": ["ISYM=0", "LWAVE=.FALSE.", "LCHARG=.FALSE."],
+            "extra keywords": [
+                "ISYM=0",
+                "LWAVE=.FALSE.",
+                "LCHARG=.FALSE.",
+                "ISEARCH=0",
+            ],
         }
         for key, value in values.items():
             energy.parameters[key].value = value
@@ -551,7 +559,8 @@ def test_the_electronic_method_can_be_chosen(catalog):
         cell,
         MC,
         key="c1-cell",
-        options={"grid": {"max_spacing": 0.0829}, "electronic method": "all"},
+        options={"grid": {"max_spacing": 0.0829}, "electronic method": "normal"},
         resources=seamm_exec.Resources(ntasks=16),
     )
-    assert incar(task)["ALGO"] == "All"
+    # and then the line search the step uses elsewhere
+    assert incar(task)["ALGO"] == "Normal" and incar(task)["ISEARCH"] == "1"

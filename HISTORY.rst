@@ -1,6 +1,18 @@
 =======
 History
 =======
+2026.10.8 -- Bugfix: whole cells converge reliably again
+    * A whole cell run as a model-chemistry task now uses ALGO = All with VASP's
+      legacy line search (ISEARCH = 0), replacing ALGO = Normal (Davidson) from
+      2026.10.7. Davidson diverged in a 32-molecule FEC cell with r2SCAN, and with
+      gentler density mixing it diverged in a 32-molecule EC cell. ALGO = All with
+      the new line search (ISEARCH = 1) aborts on the FEC cell ("EDWAV: internal
+      error, the gradient is not orthogonal"). With ISEARCH = 0 both cells
+      converge, to the same energies the other settings give where they work.
+    * Fragments are unchanged (ALGO = All, ISEARCH = 1). Setting ``options
+      ["electronic method"]`` chooses another minimizer, with the line search the
+      step uses elsewhere (ISEARCH = 1).
+
 2026.10.7 -- The step declares what its cost model is made of
     * ``energy.TIMING_SPEC`` -- valence electrons and the grid volume (the cell
       volume scaled by (ENCUT/500 eV)^1.5, now a descriptor of the record) as size
