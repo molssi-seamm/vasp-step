@@ -315,13 +315,6 @@ def get_task(
     # The same conversion of the values as the substep's (e.g. "no" -> False)
     parameters = vasp_step.EnergyParameters()
     values = dict(SETTINGS)
-    if periodic:
-        # A whole cell is minimized with Davidson (ALGO = Normal): VASP's
-        # conjugate gradient (ALGO = All) aborts reproducibly on some cells,
-        # "EDWAV: internal error, the gradient is not orthogonal" (32 FEC, on 24
-        # and 32 ranks alike). The minimizer does not change the converged
-        # energy, forces or stress at EDIFF 1e-7; fragments keep ALGO = All.
-        values["electronic method"] = "normal"
     if options.get("electronic method"):
         values["electronic method"] = options["electronic method"]
     values["model"], values["submodel"] = model, submodel
@@ -352,6 +345,16 @@ def get_task(
         extra += [("NGXF", 2 * ng[0]), ("NGYF", 2 * ng[1]), ("NGZF", 2 * ng[2])]
     if dipole:
         extra += [("IDIPOL", 4), ("LDIPOL", ".TRUE."), ("DIPOL", "0.5 0.5 0.5")]
+    if periodic and values["electronic method"] == "all":
+        # A whole cell uses conjugate gradient with VASP's legacy line search
+        # (ISEARCH = 0). The new one (ISEARCH = 1) aborts reproducibly on some
+        # cells, "EDWAV: internal error, the gradient is not orthogonal" (32
+        # FEC, on 24 and 32 ranks alike), and Davidson (ALGO = Normal) diverges
+        # in large r2SCAN cells: with VASP's default mixing in 32 FEC, and with
+        # gentler mixing (AMIX 0.2, BMIX 0.0001) in 32 EC, where the energy fell
+        # to -1e6 eV. ISEARCH = 0 converges both: 32 EC to the energy ISEARCH = 1
+        # gives, 32 FEC to the one Davidson with gentler mixing gives.
+        extra.append(("ISEARCH", 0))
 
     functional = vasp_step.metadata["computational models"][
         "Density Functional Theory (DFT)"
