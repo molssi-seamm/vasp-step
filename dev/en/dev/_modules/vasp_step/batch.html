@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vasp_step.batch &#8212; SEAMM VASP Plug-in 2026.10.8 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=c224919a" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
+
+    <script src="../../_static/documentation_options.js?v=e2241af4"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/vasp_step/batch';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2026.10.8" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/SEAMM logo.png" class="logo__image only-light" alt=""/>
+    <img src="../../_static/SEAMM Inverted 288x181.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">VASP</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/index.html">
+    Developer Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Documentation
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../authors.html">
+    Development Team
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../history.html">
+    History
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://molssi-seamm.github.io">
+    Main SEAMM documentation
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://molssi-seamm.github.io">
+    SEAMM Documentation
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://molssi.org">
+    MolSSI
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/molssi-seamm/geometry_analysis_step" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/MolSSI_NSF" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-twitter fa-lg" aria-hidden="true"></i><span class="visually-hidden">Twitter</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../getting_started/index.html">
+    Getting Started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/index.html">
+    Developer Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api/index.html">
+    API Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../authors.html">
+    Development Team
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../history.html">
+    History
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://molssi-seamm.github.io">
+    Main SEAMM documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://molssi-seamm.github.io">
+    SEAMM Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://molssi.org">
+    MolSSI
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/molssi-seamm/geometry_analysis_step" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/MolSSI_NSF" title="Twitter" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-twitter fa-lg" aria-hidden="true"></i><span class="visually-hidden">Twitter</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">vasp_step.batch</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for vasp_step.batch</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">"""VASP's side of the Model Chemistry batch contract.</span>
+
+<span class="sd">``get_task`` writes the same inputs the Energy substep writes for the same</span>
+<span class="sd">settings (both use :mod:`vasp_step.inputs`), and ``analyze_task`` reads the</span>
+<span class="sd">energy, forces and stress back. The model chemistries are</span>
+
+<span class="sd">    VASP:DFT@&lt;functional&gt;/&lt;potentials&gt;@&lt;ENCUT in eV&gt;</span>
+
+<span class="sd">for example ``VASP:DFT@r2SCAN-D4/PAW-hard@1200``. The potentials are a PAW set,</span>
+<span class="sd">optionally a named variant (``PAW`` = potpaw_PBE.64 with VASP's recommended</span>
+<span class="sd">potentials, ``PAW-hard`` = the same with the hard potentials where they exist,</span>
+<span class="sd">``PAW-LDA`` = potpaw_LDA.64). Without a cutoff, ENCUT is 1.3 × the largest</span>
+<span class="sd">ENMAX of the potentials.</span>
+
+<span class="sd">Dispersion. A functional with ``-D4`` is the functional plus the dftd4 program's</span>
+<span class="sd">D4 correction for it, computed in the same task after VASP (``dftd4`` in</span>
+<span class="sd">vasp.ini), because VASP builds are often compiled without D4 (IVDW = 13). A</span>
+<span class="sd">periodic cell gets the periodic D4; a fragment in a box gets the D4 of the</span>
+<span class="sd">isolated fragment, as its molecular counterparts do, without the dispersion</span>
+<span class="sd">with its images.</span>
+
+<span class="sd">``options`` for a structure:</span>
+
+<span class="sd">* ``grid``: ``{"max_spacing": Å}`` sets the cell's FFT grid explicitly (NGX,</span>
+<span class="sd">  NGXF = 2·NGX, ...), the cell's atoms shifted by whole grid steps. With</span>
+<span class="sd">  ``"reference_cell"`` (3x3) a molecular structure is a fragment registered on</span>
+<span class="sd">  that parent cell's grid (see :mod:`vasp_step.grid`), in a box of its extent</span>
+<span class="sd">  plus ``"padding"`` (7.5 Å), with the dipole correction. Without ``grid`` a</span>
+<span class="sd">  molecular structure cannot run.</span>
+<span class="sd">* ``charge``, ``multiplicity``: override the structure's.</span>
+<span class="sd">* ``dipole``: False to leave out the dipole correction of a fragment.</span>
+
+<span class="sd">The stress comes back in GPa as a stress (sigma = -P, tensile positive), as the</span>
+<span class="sd">Energy substep stores it, so the model chemistries declare</span>
+<span class="sd">``stress_convention = "stress"``; with D4 it includes D4's.</span>
+
+<span class="sd">The POTCARs are read where the task is built, from the VASP potential library</span>
+<span class="sd">(``&lt;SEAMM&gt;/Parameters/VASP``, catalogued by the VASP step) on that machine.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">seamm_exec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">seamm_exec.evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisError</span><span class="p">,</span> <span class="n">check_properties</span><span class="p">,</span> <span class="n">structure_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">seamm_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">grid</span> <span class="k">as</span> <span class="n">grid_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">inputs</span>
+
+<span class="c1">#: The PAW sets the model chemistries name: name -&gt; (set, variant)</span>
+<span class="n">POTENTIAL_SETS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"PAW"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"potpaw_PBE.64"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s2">"PAW-hard"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"potpaw_PBE.64"</span><span class="p">,</span> <span class="s2">"hard"</span><span class="p">),</span>
+    <span class="s2">"PAW-LDA"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"potpaw_LDA.64"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="c1">#: dftd4's name for the functionals that have D4 parameters</span>
+<span class="n">DFTD4_FUNCTIONALS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"PBE"</span><span class="p">:</span> <span class="s2">"pbe"</span><span class="p">,</span>
+    <span class="s2">"RPBE"</span><span class="p">:</span> <span class="s2">"rpbe"</span><span class="p">,</span>
+    <span class="s2">"revPBE"</span><span class="p">:</span> <span class="s2">"revpbe"</span><span class="p">,</span>
+    <span class="s2">"TPSS"</span><span class="p">:</span> <span class="s2">"tpss"</span><span class="p">,</span>
+    <span class="s2">"SCAN"</span><span class="p">:</span> <span class="s2">"scan"</span><span class="p">,</span>
+    <span class="s2">"r2SCAN"</span><span class="p">:</span> <span class="s2">"r2scan"</span><span class="p">,</span>
+    <span class="s2">"B3LYP"</span><span class="p">:</span> <span class="s2">"b3lyp"</span><span class="p">,</span>
+    <span class="s2">"PBE0"</span><span class="p">:</span> <span class="s2">"pbe0"</span><span class="p">,</span>
+    <span class="s2">"HSE06"</span><span class="p">:</span> <span class="s2">"hse06"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">#: Energy-parameter settings of a batch calculation (on top of the defaults)</span>
+<span class="n">SETTINGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"k-grid method"</span><span class="p">:</span> <span class="s2">"𝚪-point"</span><span class="p">,</span>
+    <span class="s2">"precision"</span><span class="p">:</span> <span class="s2">"accurate"</span><span class="p">,</span>
+    <span class="s2">"electronic method"</span><span class="p">:</span> <span class="s2">"all"</span><span class="p">,</span>
+    <span class="s2">"ediff"</span><span class="p">:</span> <span class="mf">1.0e-7</span><span class="p">,</span>
+    <span class="s2">"nelm"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="s2">"smearing width"</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="s2">"lreal"</span><span class="p">:</span> <span class="s2">"no"</span><span class="p">,</span>
+    <span class="s2">"lorbit"</span><span class="p">:</span> <span class="s2">"no"</span><span class="p">,</span>
+    <span class="s2">"kpar"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"use hdf5 files"</span><span class="p">:</span> <span class="s2">"no"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">#: Narrower cells need k-points: refused at the Gamma point alone (Å)</span>
+<span class="n">GAMMA_ONLY_WIDTH</span> <span class="o">=</span> <span class="mf">10.0</span>
+
+<span class="n">HARTREE_EV</span> <span class="o">=</span> <span class="n">Q_</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"E_h"</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">"eV"</span><span class="p">)</span>
+<span class="n">EV_KJ</span> <span class="o">=</span> <span class="n">Q_</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"eV"</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">"kJ/mol"</span><span class="p">)</span>
+<span class="n">BOHR</span> <span class="o">=</span> <span class="n">Q_</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"bohr"</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">"Å"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="functionals">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.functionals">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">functionals</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""The functionals: name -&gt; (model, submodel, dftd4 name or None)."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">vasp_step</span>
+
+    <span class="n">dft</span> <span class="o">=</span> <span class="n">vasp_step</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"computational models"</span><span class="p">][</span><span class="s2">"Density Functional Theory (DFT)"</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">dft</span><span class="p">[</span><span class="s2">"models"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">submodel</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">"parameterizations"</span><span class="p">]:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">submodel</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">" : "</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">submodel</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">DFTD4_FUNCTIONALS</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-D4"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">submodel</span><span class="p">,</span> <span class="n">DFTD4_FUNCTIONALS</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="get_model_chemistry_options">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.get_model_chemistry_options">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_model_chemistry_options</span><span class="p">(</span><span class="n">periodic_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mdi_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""VASP's model chemistries (all periodic, none through MDI)."""</span>
+    <span class="k">if</span> <span class="n">mdi_only</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">functionals</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"-D4BJ"</span><span class="p">):</span>
+            <span class="c1"># VASP's own D4 (IVDW = 13) needs a build with DFTD4; the -D4 levels</span>
+            <span class="c1"># (dftd4 run in the task) work with any build.</span>
+            <span class="k">continue</span>
+        <span class="n">potentials</span> <span class="o">=</span> <span class="s2">"PAW-LDA"</span> <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Local-density"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"PAW"</span>
+        <span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"model_chemistry"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"VASP:DFT@</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">potentials</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"DFT"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+            <span class="s2">"periodic_native"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"periodic_mdi"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"elements"</span><span class="p">:</span> <span class="s2">"1-94"</span><span class="p">,</span>
+            <span class="s2">"mdi_capable"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">"mdi_method_arg"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"prefers_batch"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"stress_convention"</span><span class="p">:</span> <span class="s2">"stress"</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">return</span> <span class="n">options</span></div>
+
+
+
+<div class="viewcode-block" id="potential_catalog">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.potential_catalog">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">potential_catalog</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""The catalogue of the VASP potential library on this machine."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">seamm_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">installation_path</span>
+
+    <span class="n">index</span> <span class="o">=</span> <span class="n">installation_path</span><span class="p">(</span><span class="s2">"Parameters"</span><span class="p">,</span> <span class="s2">"VASP"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"index.json"</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"The VASP potential library has no catalogue (</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">). Run a VASP "</span>
+            <span class="s2">"step once on this machine to create it."</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_level</span><span class="p">(</span><span class="n">model_chemistry</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""(functional name, set, variant, ENCUT or None) of a model chemistry."""</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">model_chemistry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"method"</span><span class="p">)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">functionals</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"VASP has no functional '</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">'. The functionals are: "</span>
+            <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">table</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">model_chemistry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"basis"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"PAW"</span>
+    <span class="k">if</span> <span class="n">basis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">POTENTIAL_SETS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Unknown VASP potentials '</span><span class="si">{</span><span class="n">basis</span><span class="si">}</span><span class="s2">': one of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">POTENTIAL_SETS</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
+        <span class="p">)</span>
+    <span class="n">potential_set</span><span class="p">,</span> <span class="n">variant</span> <span class="o">=</span> <span class="n">POTENTIAL_SETS</span><span class="p">[</span><span class="n">basis</span><span class="p">]</span>
+    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">model_chemistry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cutoff"</span><span class="p">)</span>
+    <span class="n">encut</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">cutoff</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">""</span><span class="p">):</span>
+        <span class="n">encut</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cutoff</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"ev"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">potential_set</span><span class="p">,</span> <span class="n">variant</span><span class="p">,</span> <span class="n">encut</span>
+
+
+<div class="viewcode-block" id="can_run_task">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.can_run_task">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">can_run_task</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">model_chemistry</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A periodic structure, or a molecule registered on a parent cell."""</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">options</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">structure_data</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">"periodicity"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">"periodicity"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s2">"reference_cell"</span> <span class="ow">in</span> <span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"grid"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span></div>
+
+
+
+<span class="c1">#: The cost model, fitted to the VASP step's timing records on ARC's TinkerCliffs</span>
+<span class="c1">#: (~/.seamm.d/timing/vasp.csv: 396,528 Gamma-point single points on 8 ranks,</span>
+<span class="c1">#: r2SCAN(-D3BJ), 1-432 atoms, 2025-12 to 2026-04)::</span>
+<span class="c1">#:</span>
+<span class="c1">#:     log t = a + b log(Ne) + c log(V (ENCUT/500 eV)^1.5)</span>
+<span class="c1">#:</span>
+<span class="c1">#: with Ne the valence electrons and V the cell volume (Å³). R² = 0.67 in log t;</span>
+<span class="c1">#: 68% of the runs within a factor of 1.3, 95% within 2. The 64,656 VASP runs of</span>
+<span class="c1">#: the MBE prototype (EDIFF 1e-7, ALGO All, 1200 eV, hard PAW) fall at 1.09</span>
+<span class="c1">#: (monomers) and 0.86 (pairs) of it on 8 ranks, so no settings factor is needed.</span>
+<span class="n">COST_FIT</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">7.209</span><span class="p">,</span> <span class="mf">0.636</span><span class="p">,</span> <span class="mf">1.342</span><span class="p">)</span>
+<span class="c1">#: Above 8 ranks the speed grows as ranks**0.5 (the prototype's 16-rank runs were</span>
+<span class="c1">#: 1.4-1.6x faster than its 8-rank ones); below, in proportion to the ranks.</span>
+<span class="n">RANK_EXPONENT</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+
+<div class="viewcode-block" id="estimated_seconds">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.estimated_seconds">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">estimated_seconds</span><span class="p">(</span><span class="n">nelect</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">encut</span><span class="p">,</span> <span class="n">ntasks</span><span class="p">,</span> <span class="n">kpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The expected wall time (s) of one VASP calculation on TinkerCliffs-like</span>
+<span class="sd">    nodes: see :data:`COST_FIT`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nelect : float</span>
+<span class="sd">        Valence electrons.</span>
+<span class="sd">    volume : float</span>
+<span class="sd">        The cell (or box) volume, Å³.</span>
+<span class="sd">    encut : float</span>
+<span class="sd">        Plane-wave cutoff, eV.</span>
+<span class="sd">    ntasks : int</span>
+<span class="sd">        MPI ranks.</span>
+<span class="sd">    kpoints : int</span>
+<span class="sd">        k-points in the mesh (an upper bound on the irreducible ones).</span>
+<span class="sd">    """</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">COST_FIT</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">volume</span> <span class="o">*</span> <span class="p">(</span><span class="n">encut</span> <span class="o">/</span> <span class="mf">500.0</span><span class="p">)</span> <span class="o">**</span> <span class="mf">1.5</span>
+    <span class="n">t8</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nelect</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">grid</span><span class="p">))</span>
+    <span class="n">ntasks</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ntasks</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">ntasks</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="mf">8.0</span> <span class="o">/</span> <span class="n">ntasks</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="p">(</span><span class="mf">8.0</span> <span class="o">/</span> <span class="n">ntasks</span><span class="p">)</span> <span class="o">**</span> <span class="n">RANK_EXPONENT</span>
+    <span class="k">return</span> <span class="n">t8</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">kpoints</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="cell_walltime">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.cell_walltime">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cell_walltime</span><span class="p">(</span><span class="n">estimate</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The time limit (s) for a cell's calculation: 3x the estimate, at least an</span>
+<span class="sd">    hour, in quarter hours. The prototype's slowest cell (a dense frame) took</span>
+<span class="sd">    2.8x the median."""</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">3600.0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">estimate</span> <span class="o">/</span> <span class="mf">900.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">900.0</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_zval</span><span class="p">(</span><span class="n">potcar</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The valence charge of each potential in a POTCAR, in order."""</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">potcar</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">"ZVAL"</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"ZVAL"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">values</span>
+
+
+<div class="viewcode-block" id="get_task">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.get_task">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_task</span><span class="p">(</span>
+    <span class="n">configuration</span><span class="p">,</span>
+    <span class="n">model_chemistry</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">properties</span><span class="o">=</span><span class="p">(</span><span class="s2">"energy"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">),</span>
+    <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">resources</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A :class:`seamm_exec.Task` computing VASP's energy, forces and (for a</span>
+<span class="sd">    cell, if asked) stress. See the module docstring."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">vasp_step</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">options</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">structure_data</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+    <span class="n">method</span><span class="p">,</span> <span class="n">potential_set</span><span class="p">,</span> <span class="n">variant</span><span class="p">,</span> <span class="n">encut</span> <span class="o">=</span> <span class="n">_level</span><span class="p">(</span><span class="n">model_chemistry</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">submodel</span><span class="p">,</span> <span class="n">d4</span> <span class="o">=</span> <span class="n">functionals</span><span class="p">()[</span><span class="n">method</span><span class="p">]</span>
+    <span class="n">grid_options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"grid"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">periodic</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"periodicity"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">periodic</span> <span class="ow">and</span> <span class="s2">"reference_cell"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">grid_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"VASP calculations are periodic: a molecule needs grid['reference_cell'] "</span>
+            <span class="s2">"to be placed in a box registered on its parent cell."</span>
+        <span class="p">)</span>
+    <span class="n">charge</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"charge"</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">"charge"</span><span class="p">]))</span>
+    <span class="n">multiplicity</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"multiplicity"</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">"multiplicity"</span><span class="p">]))</span>
+    <span class="n">atnos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"atomic_numbers"</span><span class="p">])</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"coordinates"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">max_spacing</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">grid_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_spacing"</span><span class="p">,</span> <span class="n">grid_</span><span class="o">.</span><span class="n">DEFAULT_MAX_SPACING</span><span class="p">))</span>
+
+    <span class="n">ng</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dipole</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">k_spacing</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"k_spacing"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">periodic</span><span class="p">:</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"cell"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k_spacing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">widths</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">cell</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">cell</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">cell</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">widths</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">GAMMA_ONLY_WIDTH</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"The cell is </span><span class="si">{</span><span class="n">widths</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Å across at its narrowest: "</span>
+                    <span class="s2">"the Gamma point alone would not sample it. Give "</span>
+                    <span class="s2">"options['k_spacing'] (1/Å), or use a cell of at least "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">GAMMA_ONLY_WIDTH</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> Å."</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">grid_options</span><span class="p">:</span>
+            <span class="n">placed</span> <span class="o">=</span> <span class="n">grid_</span><span class="o">.</span><span class="n">register_cell</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">max_spacing</span><span class="p">)</span>
+            <span class="n">xyz</span><span class="p">,</span> <span class="n">ng</span> <span class="o">=</span> <span class="n">placed</span><span class="p">[</span><span class="s2">"coordinates"</span><span class="p">],</span> <span class="n">placed</span><span class="p">[</span><span class="s2">"ng"</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">placed</span> <span class="o">=</span> <span class="n">grid_</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+            <span class="n">xyz</span><span class="p">,</span>
+            <span class="n">grid_options</span><span class="p">[</span><span class="s2">"reference_cell"</span><span class="p">],</span>
+            <span class="n">max_spacing</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">grid_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"padding"</span><span class="p">,</span> <span class="n">grid_</span><span class="o">.</span><span class="n">DEFAULT_PADDING</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="n">xyz</span><span class="p">,</span> <span class="n">ng</span> <span class="o">=</span> <span class="n">placed</span><span class="p">[</span><span class="s2">"coordinates"</span><span class="p">],</span> <span class="n">placed</span><span class="p">[</span><span class="s2">"ng"</span><span class="p">]</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">placed</span><span class="p">[</span><span class="s2">"box"</span><span class="p">])</span>
+        <span class="n">dipole</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dipole"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">catalog</span> <span class="o">=</span> <span class="n">potential_catalog</span><span class="p">()[</span><span class="n">potential_set</span><span class="p">]</span>
+    <span class="n">potcar</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">potcar_text</span><span class="p">(</span><span class="n">atnos</span><span class="p">,</span> <span class="n">potential_set</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">)</span>
+    <span class="n">enmax</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">enmax</span><span class="p">(</span><span class="n">atnos</span><span class="p">,</span> <span class="n">potential_set</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">encut</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">encut</span> <span class="o">=</span> <span class="mf">1.3</span> <span class="o">*</span> <span class="n">enmax</span>
+    <span class="k">elif</span> <span class="n">encut</span> <span class="o">&lt;</span> <span class="n">enmax</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"ENCUT </span><span class="si">{</span><span class="n">encut</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> eV is below the largest ENMAX of the potentials "</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">enmax</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> eV, </span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="si">}</span><span class="s2">): the basis would be incomplete."</span>
+        <span class="p">)</span>
+
+    <span class="n">ntasks</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">resources</span><span class="o">.</span><span class="n">ntasks</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">ntasks</span><span class="p">)</span>
+    <span class="c1"># The same conversion of the values as the substep's (e.g. "no" -&gt; False)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">vasp_step</span><span class="o">.</span><span class="n">EnergyParameters</span><span class="p">()</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">SETTINGS</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"electronic method"</span><span class="p">):</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"electronic method"</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s2">"electronic method"</span><span class="p">]</span>
+    <span class="n">values</span><span class="p">[</span><span class="s2">"model"</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">"submodel"</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="p">,</span> <span class="n">submodel</span>
+    <span class="n">values</span><span class="p">[</span><span class="s2">"calculate stress"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">"yes"</span> <span class="k">if</span> <span class="p">(</span><span class="n">periodic</span> <span class="ow">and</span> <span class="s2">"stress"</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"no"</span>
+    <span class="p">)</span>
+    <span class="n">values</span><span class="p">[</span><span class="s2">"ncore"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span> <span class="k">if</span> <span class="n">ntasks</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">multiplicity</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"spin polarization"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"collinear"</span>
+    <span class="k">if</span> <span class="n">k_spacing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">periodic</span><span class="p">:</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"k-grid method"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"grid spacing"</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"k-spacing"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">k_spacing</span><span class="p">)</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">"centering"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Gamma"</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">current_values_to_dict</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="p">{})</span>
+
+    <span class="n">extra</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"ISYM"</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="s2">"LWAVE"</span><span class="p">,</span> <span class="s2">".FALSE."</span><span class="p">),</span> <span class="p">(</span><span class="s2">"LCHARG"</span><span class="p">,</span> <span class="s2">".FALSE."</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">charge</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">atom_order</span><span class="p">(</span><span class="n">atnos</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">atnos</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">nelect</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">z</span> <span class="o">*</span> <span class="n">counts</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">z</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">_zval</span><span class="p">(</span><span class="n">potcar</span><span class="p">),</span> <span class="n">unique</span><span class="p">))</span> <span class="o">-</span> <span class="n">charge</span>
+        <span class="n">extra</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">"NELECT"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">nelect</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">multiplicity</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">extra</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">"NUPDOWN"</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">ng</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">+=</span> <span class="p">[(</span><span class="s2">"NGX"</span><span class="p">,</span> <span class="n">ng</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="s2">"NGY"</span><span class="p">,</span> <span class="n">ng</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="s2">"NGZ"</span><span class="p">,</span> <span class="n">ng</span><span class="p">[</span><span class="mi">2</span><span class="p">])]</span>
+        <span class="n">extra</span> <span class="o">+=</span> <span class="p">[(</span><span class="s2">"NGXF"</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ng</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="s2">"NGYF"</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ng</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="s2">"NGZF"</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ng</span><span class="p">[</span><span class="mi">2</span><span class="p">])]</span>
+    <span class="k">if</span> <span class="n">dipole</span><span class="p">:</span>
+        <span class="n">extra</span> <span class="o">+=</span> <span class="p">[(</span><span class="s2">"IDIPOL"</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="s2">"LDIPOL"</span><span class="p">,</span> <span class="s2">".TRUE."</span><span class="p">),</span> <span class="p">(</span><span class="s2">"DIPOL"</span><span class="p">,</span> <span class="s2">"0.5 0.5 0.5"</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">periodic</span> <span class="ow">and</span> <span class="n">values</span><span class="p">[</span><span class="s2">"electronic method"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"all"</span><span class="p">:</span>
+        <span class="c1"># A whole cell uses conjugate gradient with VASP's legacy line search</span>
+        <span class="c1"># (ISEARCH = 0). The new one (ISEARCH = 1) aborts reproducibly on some</span>
+        <span class="c1"># cells, "EDWAV: internal error, the gradient is not orthogonal" (32</span>
+        <span class="c1"># FEC, on 24 and 32 ranks alike), and Davidson (ALGO = Normal) diverges</span>
+        <span class="c1"># in large r2SCAN cells: with VASP's default mixing in 32 FEC, and with</span>
+        <span class="c1"># gentler mixing (AMIX 0.2, BMIX 0.0001) in 32 EC, where the energy fell</span>
+        <span class="c1"># to -1e6 eV. ISEARCH = 0 converges both: 32 EC to the energy ISEARCH = 1</span>
+        <span class="c1"># gives, 32 FEC to the one Davidson with gentler mixing gives.</span>
+        <span class="n">extra</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">"ISEARCH"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+    <span class="n">functional</span> <span class="o">=</span> <span class="n">vasp_step</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"computational models"</span><span class="p">][</span>
+        <span class="s2">"Density Functional Theory (DFT)"</span>
+    <span class="p">][</span><span class="s2">"models"</span><span class="p">][</span><span class="n">model</span><span class="p">][</span><span class="s2">"parameterizations"</span><span class="p">][</span><span class="n">submodel</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">d4</span><span class="p">:</span>
+        <span class="c1"># dftd4 adds the dispersion: VASP must not add its own as well (plain</span>
+        <span class="c1"># revPBE's metadata carries IVDW = 12, for one)</span>
+        <span class="n">functional</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">functional</span><span class="p">)</span>
+        <span class="n">functional</span><span class="p">[</span><span class="s2">"keywords"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">functional</span><span class="p">[</span><span class="s2">"keywords"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">"IVDW"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"VDW_"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="n">keywords</span><span class="p">,</span> <span class="n">descriptions</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">keywords</span><span class="p">(</span>
+        <span class="n">P</span><span class="p">,</span>
+        <span class="n">functional</span><span class="o">=</span><span class="n">functional</span><span class="p">,</span>
+        <span class="n">istart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">encut</span><span class="o">=</span><span class="n">encut</span><span class="p">,</span>
+        <span class="n">extra</span><span class="o">=</span><span class="n">extra</span><span class="p">,</span>
+        <span class="n">keyword_metadata</span><span class="o">=</span><span class="n">vasp_step</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"keywords"</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">P</span><span class="p">[</span><span class="s2">"k-grid method"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"grid spacing"</span><span class="p">:</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">kpoints</span><span class="p">,</span> <span class="n">gamma_only</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">kpoints_text</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"INCAR"</span><span class="p">:</span> <span class="n">inputs</span><span class="o">.</span><span class="n">incar_text</span><span class="p">(</span>
+            <span class="n">keywords</span><span class="p">,</span> <span class="n">descriptions</span><span class="p">,</span> <span class="n">vasp_step</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"keywords"</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="s2">"POTCAR"</span><span class="p">:</span> <span class="n">potcar</span><span class="p">,</span>
+        <span class="s2">"KPOINTS"</span><span class="p">:</span> <span class="n">kpoints</span><span class="p">,</span>
+        <span class="s2">"POSCAR"</span><span class="p">:</span> <span class="n">inputs</span><span class="o">.</span><span class="n">poscar_text</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">atnos</span><span class="p">,</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">cartesian</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">digits</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"</span><span class="si">{gamma_code}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">gamma_only</span> <span class="k">else</span> <span class="s2">"</span><span class="si">{code}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"&gt;"</span><span class="p">,</span> <span class="s2">"vasp.out"</span><span class="p">,</span> <span class="s2">"2&gt;&amp;1"</span><span class="p">]</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"OUTCAR"</span><span class="p">:</span> <span class="s2">"General timing"</span><span class="p">}</span>
+    <span class="n">return_files</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"INCAR"</span><span class="p">,</span>
+        <span class="s2">"KPOINTS"</span><span class="p">,</span>
+        <span class="s2">"POSCAR"</span><span class="p">,</span>
+        <span class="s2">"OUTCAR"</span><span class="p">,</span>
+        <span class="s2">"OSZICAR"</span><span class="p">,</span>
+        <span class="s2">"vasprun.xml"</span><span class="p">,</span>
+        <span class="s2">"vasp.out"</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">d4</span><span class="p">:</span>
+        <span class="n">d4_input</span> <span class="o">=</span> <span class="s2">"POSCAR"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">periodic</span><span class="p">:</span>
+            <span class="n">symbols</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"symbols"</span><span class="p">]</span>
+            <span class="n">files</span><span class="p">[</span><span class="s2">"fragment.xyz"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">atnos</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">z</span><span class="si">:</span><span class="s2">.10f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">xyz</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">d4_input</span> <span class="o">=</span> <span class="s2">"fragment.xyz"</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="s2">"&amp;&amp;"</span><span class="p">,</span>
+            <span class="s2">"</span><span class="si">{dftd4}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">d4_input</span><span class="p">,</span>
+            <span class="s2">"--func"</span><span class="p">,</span>
+            <span class="n">d4</span><span class="p">,</span>
+            <span class="s2">"--grad"</span><span class="p">,</span>
+            <span class="s2">"--json"</span><span class="p">,</span>
+            <span class="s2">"dftd4.json"</span><span class="p">,</span>
+            <span class="s2">"--noedisp"</span><span class="p">,</span>
+            <span class="s2">"--charge"</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">charge</span><span class="p">),</span>
+            <span class="s2">"&gt;"</span><span class="p">,</span>
+            <span class="s2">"dftd4.out"</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">success</span><span class="p">[</span><span class="s2">"dftd4.json"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"energy"</span>
+        <span class="n">return_files</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"dftd4.json"</span><span class="p">,</span> <span class="s2">"dftd4.out"</span><span class="p">,</span> <span class="s2">"fragment.xyz"</span><span class="p">]</span>
+
+    <span class="c1"># The cost estimate, and a time limit for a cell, which runs alone</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">atom_order</span><span class="p">(</span><span class="n">atnos</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">unique</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">atnos</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nelect</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">z</span> <span class="o">*</span> <span class="n">counts</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">z</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">_zval</span><span class="p">(</span><span class="n">potcar</span><span class="p">),</span> <span class="n">unique</span><span class="p">))</span> <span class="o">-</span> <span class="n">charge</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)))</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">kpoints</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]]</span>
+    <span class="n">estimate</span> <span class="o">=</span> <span class="n">estimated_seconds</span><span class="p">(</span><span class="n">nelect</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">encut</span><span class="p">,</span> <span class="n">ntasks</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">mesh</span><span class="p">)))</span>
+
+    <span class="c1"># The licensed POTCAR is not left behind in the task's directory</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"&amp;&amp;"</span><span class="p">,</span> <span class="s2">"rm"</span><span class="p">,</span> <span class="s2">"-f"</span><span class="p">,</span> <span class="s2">"POTCAR"</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">resources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="n">seamm_exec</span><span class="o">.</span><span class="n">Resources</span><span class="p">(</span><span class="n">ntasks</span><span class="o">=</span><span class="n">ntasks</span><span class="p">,</span> <span class="n">mem_per_cpu</span><span class="o">=</span><span class="mi">2_000_000_000</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">periodic</span> <span class="ow">and</span> <span class="n">resources</span><span class="o">.</span><span class="n">walltime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">resources</span><span class="p">,</span> <span class="n">walltime</span><span class="o">=</span><span class="n">cell_walltime</span><span class="p">(</span><span class="n">estimate</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">seamm_exec</span><span class="o">.</span><span class="n">Task</span><span class="p">(</span>
+        <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+        <span class="n">program</span><span class="o">=</span><span class="s2">"vasp"</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span>
+        <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span>
+        <span class="n">return_files</span><span class="o">=</span><span class="n">return_files</span><span class="p">,</span>
+        <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span>
+        <span class="n">estimated_seconds</span><span class="o">=</span><span class="n">estimate</span><span class="p">,</span>
+        <span class="n">success_text</span><span class="o">=</span><span class="n">success</span><span class="p">,</span>
+        <span class="n">fingerprint</span><span class="o">=</span><span class="n">fingerprint</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">files</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1">#: INCAR keywords that depend only on how many ranks run the task</span>
+<span class="n">_PARALLEL</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"NCORE"</span><span class="p">,</span> <span class="s2">"KPAR"</span><span class="p">,</span> <span class="s2">"NPAR"</span><span class="p">,</span> <span class="s2">"NSIM"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="fingerprint">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.fingerprint">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fingerprint</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The task's restart identity: its command and files, without the INCAR's</span>
+<span class="sd">    parallelization keywords, so a rerun with another number of ranks reuses the</span>
+<span class="sd">    finished calculations."""</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+
+    <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+    <span class="n">digest</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">"</span><span class="se">\0</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"INCAR"</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">line</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"="</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_PARALLEL</span>
+            <span class="p">)</span>
+        <span class="n">digest</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\0</span><span class="s2">"</span> <span class="o">+</span> <span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="o">+</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\0</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">digest</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="parse_vasprun">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.parse_vasprun">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_vasprun</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The final energy (sigma -&gt; 0, eV), forces (eV/Å, VASP order) and stress</span>
+<span class="sd">    (kB as VASP prints it, a pressure, or None) from vasprun.xml."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lxml</span><span class="w"> </span><span class="kn">import</span> <span class="n">etree</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">text</span><span class="p">)</span>
+    <span class="n">calculation</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">"calculation"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># The calculation's own energy block, not one of its SCF steps'</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">calculation</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"energy"</span><span class="p">)</span>
+    <span class="n">e0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"i[@name='e_0_energy']"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">array</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">calculation</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">f</span><span class="s2">"varray[@name='</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">']"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">"v"</span><span class="p">)])</span>
+
+    <span class="k">return</span> <span class="n">e0</span><span class="p">,</span> <span class="n">array</span><span class="p">(</span><span class="s2">"forces"</span><span class="p">),</span> <span class="n">array</span><span class="p">(</span><span class="s2">"stress"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="converged">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.converged">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">converged</span><span class="p">(</span><span class="n">outcar</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Whether VASP's SCF reached EDIFF (an unconverged run must not count)."""</span>
+    <span class="k">return</span> <span class="s2">"aborting loop because EDIFF is reached"</span> <span class="ow">in</span> <span class="n">outcar</span></div>
+
+
+
+<div class="viewcode-block" id="analyze_task">
+<a class="viewcode-back" href="../../developer/vasp_step.html#vasp_step.batch.analyze_task">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">analyze_task</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">,</span>
+    <span class="n">model_chemistry</span><span class="p">,</span>
+    <span class="n">configuration</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">properties</span><span class="o">=</span><span class="p">(</span><span class="s2">"energy"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">),</span>
+    <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""{"energy": kJ/mol, "gradients": (n, 3) kJ/mol/Å, "stress": (3, 3) GPa,</span>
+<span class="sd">    sigma = -P} of a finished task, in the structure's atom order.</span>
+
+<span class="sd">    Given the ``task`` that produced the result, its timing record is appended</span>
+<span class="sd">    too (``seamm_exec.record_task_timing``), as the VASP step's own runs do."""</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">structure_data</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+    <span class="n">atnos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"atomic_numbers"</span><span class="p">])</span>
+    <span class="n">periodic</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">"periodicity"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="n">outcar</span> <span class="o">=</span> <span class="n">_text</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">"OUTCAR"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_record_timing</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">outcar</span><span class="p">,</span> <span class="n">model_chemistry</span><span class="p">,</span> <span class="n">configuration</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">converged</span><span class="p">(</span><span class="n">outcar</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">AnalysisError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">': the SCF did not converge (EDIFF)"</span><span class="p">)</span>
+    <span class="n">energy</span><span class="p">,</span> <span class="n">forces</span><span class="p">,</span> <span class="n">stress</span> <span class="o">=</span> <span class="n">parse_vasprun</span><span class="p">(</span><span class="n">_text</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">"vasprun.xml"</span><span class="p">))</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">to_seamm</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">atom_order</span><span class="p">(</span><span class="n">atnos</span><span class="p">)</span>
+    <span class="n">ordered</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span>
+    <span class="n">ordered</span><span class="p">[</span><span class="n">to_seamm</span><span class="p">]</span> <span class="o">=</span> <span class="n">forces</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"energy"</span><span class="p">:</span> <span class="n">energy</span> <span class="o">*</span> <span class="n">EV_KJ</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">:</span> <span class="o">-</span><span class="n">ordered</span> <span class="o">*</span> <span class="n">EV_KJ</span><span class="p">}</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">stress</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">periodic</span><span class="p">:</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">stress</span>  <span class="c1"># kB pressure -&gt; GPa stress</span>
+    <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">_level</span><span class="p">(</span><span class="n">model_chemistry</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">functionals</span><span class="p">()[</span><span class="n">method</span><span class="p">][</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="n">d4</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_text</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">"dftd4.json"</span><span class="p">))</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"energy"</span><span class="p">]</span> <span class="o">+=</span> <span class="n">d4</span><span class="p">[</span><span class="s2">"energy"</span><span class="p">]</span> <span class="o">*</span> <span class="n">HARTREE_EV</span> <span class="o">*</span> <span class="n">EV_KJ</span>
+        <span class="n">gradient</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d4</span><span class="p">[</span><span class="s2">"gradient"</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">HARTREE_EV</span> <span class="o">/</span> <span class="n">BOHR</span>
+        <span class="k">if</span> <span class="n">periodic</span><span class="p">:</span>  <span class="c1"># dftd4 read the POSCAR: VASP order</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">gradient</span><span class="p">)</span>
+            <span class="n">g</span><span class="p">[</span><span class="n">to_seamm</span><span class="p">]</span> <span class="o">=</span> <span class="n">gradient</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"gradients"</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">"gradients"</span><span class="p">]</span> <span class="o">+</span> <span class="n">gradient</span> <span class="o">*</span> <span class="n">EV_KJ</span>
+        <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"cell"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)))</span>
+            <span class="n">virial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d4</span><span class="p">[</span><span class="s2">"virial"</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">HARTREE_EV</span>  <span class="c1"># dE/dstrain</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span> <span class="o">+</span> <span class="n">virial</span> <span class="o">/</span> <span class="n">volume</span> <span class="o">*</span> <span class="n">Q_</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"eV/Å^3"</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">"GPa"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"stress"</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"stress"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">check_properties</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">properties</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">'"</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="n">periodic</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_record_timing</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">outcar</span><span class="p">,</span> <span class="n">model_chemistry</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The timing record of a model-chemistry task; never raises."""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.energy</span><span class="w"> </span><span class="kn">import</span> <span class="n">_record_kwargs</span><span class="p">,</span> <span class="n">timing_descriptors</span>
+
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="s2">"files"</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"INCAR"</span><span class="p">,</span> <span class="s2">"KPOINTS"</span><span class="p">,</span> <span class="s2">"POSCAR"</span><span class="p">,</span> <span class="s2">"POTCAR"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">_text</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
+                    <span class="n">files</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">model_chemistry</span><span class="p">,</span> <span class="s2">"get"</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="s2">""</span><span class="p">:</span> <span class="n">d</span><span class="p">)(</span><span class="s2">"method"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">model_chemistry</span>
+        <span class="p">)</span>
+        <span class="n">descriptors</span> <span class="o">=</span> <span class="n">timing_descriptors</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">outcar</span><span class="p">,</span> <span class="n">configuration</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">seamm_exec</span><span class="o">.</span><span class="n">record_task_timing</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">,</span> <span class="o">**</span><span class="n">_record_kwargs</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Could not record the timing of VASP task </span><span class="si">{</span><span class="n">task</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_text</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">AnalysisError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">': no </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> came back"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
