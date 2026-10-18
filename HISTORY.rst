@@ -1,6 +1,12 @@
 =======
 History
 =======
+2026.10.18 -- Internal: read the output files of tasks from disk
+    * seamm-exec 2026.10.18 records where each file a task returns is, not its contents,
+      since they can be gigabytes. The VASP step reads the files it needs with
+      ``result.read()``, from disk or the task archive, and requires that version of
+      seamm-exec.
+
 2026.10.8 -- Bugfix: whole cells converge reliably again
     * A whole cell run as a model-chemistry task now uses ALGO = All with VASP's
       legacy line search (ISEARCH = 0), replacing ALGO = Normal (Davidson) from

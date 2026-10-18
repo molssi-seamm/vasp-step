@@ -581,7 +581,9 @@ def _record_timing(task, result, outcar, model_chemistry, configuration):
 
 
 def _text(result, name):
-    value = result.files.get(name)
+    """A returned file's text, read now: the result holds where it is, not its
+    contents (from disk, or from the task archive)."""
+    value = result.read(name)
     if value is None:
         raise AnalysisError(f"'{result.key}': no {name} came back")
-    return value.decode() if isinstance(value, bytes) else value
+    return value
