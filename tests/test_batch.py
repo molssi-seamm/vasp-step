@@ -4,6 +4,7 @@ runs of the pilot frame (tests/data/pilot/README.md)."""
 import gzip
 import json
 from pathlib import Path
+import tempfile
 from types import SimpleNamespace
 
 import numpy as np
@@ -292,11 +293,15 @@ def test_batch_and_substep_write_the_same_inputs(catalog, tmp_path):
 
 # ---- analyze_task ----------------------------------------------------------------
 def result_for(name):
-    files = {}
+    """A finished task's result, its files written to a directory of their own."""
+    directory = Path(tempfile.mkdtemp(prefix="vasp_result_"))
     for f in ("vasprun.xml", "OUTCAR"):
-        files[f] = gzip.open(PILOT / name / f"{f}.gz", "rt").read()
-    files["dftd4.json"] = (PILOT / name / "dftd4.json").read_text()
-    return SimpleNamespace(key=name, files=files)
+        (directory / f).write_text(gzip.open(PILOT / name / f"{f}.gz", "rt").read())
+    (directory / "dftd4.json").write_text((PILOT / name / "dftd4.json").read_text())
+    files = {f: f for f in ("vasprun.xml", "OUTCAR", "dftd4.json")}
+    return seamm_exec.TaskResult(
+        key=name, state="finished", directory=directory, files=files
+    )
 
 
 @pytest.mark.parametrize("name", ["m00", "d00_18"])
@@ -342,7 +347,7 @@ def test_analyze_cell_and_the_sign_of_the_stress():
 
 def test_final_energy_not_an_scf_step():
     energy, forces, stress = batch.parse_vasprun(
-        result_for("r2_cell").files["vasprun.xml"]
+        result_for("r2_cell").read("vasprun.xml")
     )
     assert energy == pytest.approx(EXPECTED["cell"]["vasp_E"], abs=1e-7)
     assert forces.shape == (192, 3) and stress.shape == (3, 3)
@@ -350,8 +355,11 @@ def test_final_energy_not_an_scf_step():
 
 def test_unconverged_scf_is_refused():
     result = result_for("r2_m00")
-    result.files["OUTCAR"] = result.files["OUTCAR"].replace(
-        "aborting loop because EDIFF is reached", "aborting loop"
+    outcar = result.path("OUTCAR")
+    outcar.write_text(
+        outcar.read_text().replace(
+            "aborting loop because EDIFF is reached", "aborting loop"
+        )
     )
     with pytest.raises(AnalysisError, match="did not converge"):
         batch.analyze_task(result, MC, geometry("m00"))
